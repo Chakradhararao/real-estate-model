@@ -1,0 +1,84 @@
+city,segment,locality,zone,unit,price_low,price_high,yoy_pct,basis,source,source_url,as_of
+Hyderabad,Apartments,Jubilee Hills,Central-West,sqft,10350,16700,3.5,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,Banjara Hills,Central-West,sqft,6600,13700,20.1,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,HITEC City,West,sqft,12000,14000,,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,Gachibowli,West,sqft,9850,13850,13.7,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,Financial District,West,sqft,10800,13700,,Listing avg,RealtyHunting / PropNewz,https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,Kokapet,West,sqft,11250,11950,,Listing avg,RealtyHunting (99acres vs Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,Nallagandla,West,sqft,8850,13150,,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,Narsingi,West,sqft,10650,10950,,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,Kondapur,West,sqft,8650,13700,6.3,Listing avg,RealtyHunting; YoY from PropNewz (99acres),https://www.propnewz.com/blog/kondapur-gachibowli-real-estate-hyderabad-2026-06-29,2026-10-06
+Hyderabad,Apartments,Tellapur,West,sqft,7800,8500,8.0,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,Kollur,West,sqft,6500,7300,,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,Kukatpally / KPHB,North-West,sqft,7650,10850,,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,Miyapur,North-West,sqft,7700,8600,,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,Bachupally,North,sqft,5200,8150,,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,Kompally,North,sqft,5850,8150,,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,Uppal,East,sqft,5500,9050,19.4,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,LB Nagar,East,sqft,5200,7950,,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,Shamshabad,South,sqft,7400,8300,,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Apartments,Tukkuguda,South,sqft,4200,5350,,Listing avg,RealtyHunting (99acres + Square Yards),https://realtyhunting.com/property-rates-in-hyderabad/,2026-10-06
+Hyderabad,Plots,Tellapur,West,sqyd,80000,150000,,Market ask,1acre.in research,https://1acre.in/research/kokapet-tellapur-orr-land-prices-2026,2026-10-01
+Hyderabad,Plots,Kokapet (residential),West,sqyd,27000,47600,,Govt guidance value (floor; ~doubled Jun 2026),1acre.in (June 2026 revision),https://1acre.in/research/kokapet-tellapur-orr-land-prices-2026,2026-06-05
+Hyderabad,Plots,Mokila - Kollur,West,sqyd,45000,65000,,Market ask (developer),MA Realty (promotional),https://ma-realty-website.pages.dev/blog/open-plots-in-hyderabad/,2026-04-17
+Hyderabad,Plots,Shankarpalli,West,sqyd,40000,55000,,Market ask (developer),MA Realty (promotional),https://ma-realty-website.pages.dev/blog/open-plots-in-hyderabad/,2026-04-17
+Hyderabad,Plots,Chevella,West,sqyd,22000,35000,,Market ask (developer),MA Realty (promotional),https://ma-realty-website.pages.dev/blog/open-plots-in-hyderabad/,2026-04-17
+Hyderabad,Plots,Sangareddy,North-West,sqyd,22000,32000,,Market ask (developer),MA Realty (promotional),https://ma-realty-website.pages.dev/blog/open-plots-in-hyderabad/,2026-04-17
+Hyderabad,Plots,Nizampet,North-West,sqyd,26300,26300,,Govt guidance value (median),Assetly (IGRS capture),https://assetlyhq.com/blog/telangana-open-plot-urban-land-rates-2026/,2026-06-16
+Hyderabad,Plots,Bachupally,North,sqyd,22600,22600,,Govt guidance value (median),Assetly (IGRS capture),https://assetlyhq.com/blog/telangana-open-plot-urban-land-rates-2026/,2026-06-16
+Hyderabad,Plots,Shamirpet,North,sqyd,25000,45000,,Market ask (developer),MA Realty (promotional),https://ma-realty-website.pages.dev/blog/open-plots-in-hyderabad/,2026-04-17
+Hyderabad,Plots,Hayathnagar,East,sqyd,21400,21400,,Govt guidance value (median),Assetly (IGRS capture),https://assetlyhq.com/blog/telangana-open-plot-urban-land-rates-2026/,2026-06-16
+Hyderabad,Plots,Ibrahimpatnam,South-East,sqyd,18000,28000,,Market ask (developer),MA Realty (promotional),https://ma-realty-website.pages.dev/blog/open-plots-in-hyderabad/,2026-04-17
+Hyderabad,Plots,Shamshabad (Bahadurguda),South,sqyd,31500,31500,,Govt guidance value (median),Assetly (IGRS capture),https://assetlyhq.com/blog/telangana-open-plot-urban-land-rates-2026/,2026-06-16
+Hyderabad,Villas,Kokapet,West,sqft,12000,15000,15.0,Project asks,PropNewz (12-18% p.a.),https://www.propnewz.com/blog/villa-buying-hyderabad-western-corridor-kokapet-tellapur-narsingi-2026,2026-08-26
+Hyderabad,Villas,Tellapur,West,sqft,8500,14500,10.0,Project asks,PropNewz (8-12% p.a.),https://www.propnewz.com/blog/villa-buying-hyderabad-western-corridor-kokapet-tellapur-narsingi-2026,2026-08-26
+Hyderabad,Villas,Narsingi,West,sqft,8500,9600,10.0,Project asks,PropNewz (8-12% p.a.),https://www.propnewz.com/blog/villa-buying-hyderabad-western-corridor-kokapet-tellapur-narsingi-2026,2026-08-26
+Hyderabad,Villas,Kollur / Nandigama,West,sqft,8499,8499,,Project ask,PropNewz (single project),https://www.propnewz.com/blog/villa-buying-hyderabad-western-corridor-kokapet-tellapur-narsingi-2026,2026-08-26
+Hyderabad,Independent Houses,Yella Reddy Guda,Central,sqft,5300,13000,12.5,Listing range,NoBroker (low confidence),https://www.nobroker.in/blog/property-rates-in-hyderabad/,2026-10-30
+Hyderabad,Independent Houses,Botanical Garden Road,West,sqft,7000,10000,15.0,Listing range,NoBroker (low confidence),https://www.nobroker.in/blog/property-rates-in-hyderabad/,2026-10-30
+Hyderabad,Independent Houses,Manchirevula,West,sqft,7000,9100,7.0,Listing range,NoBroker (low confidence),https://www.nobroker.in/blog/property-rates-in-hyderabad/,2026-10-30
+Hyderabad,Independent Houses,Ilapur Road,North-West,sqft,5000,12000,,Listing range,NoBroker (low confidence),https://www.nobroker.in/blog/property-rates-in-hyderabad/,2026-10-30
+Hyderabad,Independent Houses,Bachupally,North,sqft,5000,8000,12.5,Listing range,NoBroker (low confidence),https://www.nobroker.in/blog/property-rates-in-hyderabad/,2026-10-30
+Hyderabad,Independent Houses,Chandrayangutta,South,sqft,4000,7000,15.5,Listing range,NoBroker (low confidence),https://www.nobroker.in/blog/property-rates-in-hyderabad/,2026-10-30
+Bangalore,Apartments,Indiranagar,Central-East,sqft,14000,29000,,Listing range,Bangalore Properties blog (Apr 2026),https://bangalorepropertyexpert.blogspot.com/2026/04/bangalore-property-price-report-april.html,2026-04-07
+Bangalore,Apartments,Jayanagar,South,sqft,28846,28846,,Listing avg,Housing.com price trends,https://housing.com/price-trends/bangalore_karnataka-P38f9yfbk7p3m2h1f,2026-11-12
+Bangalore,Apartments,Koramangala,South-East,sqft,23891,23891,,Listing avg,Housing.com price trends,https://housing.com/price-trends/bangalore_karnataka-P38f9yfbk7p3m2h1f,2026-11-12
+Bangalore,Apartments,HSR Layout,South-East,sqft,16821,16821,,Listing avg,Housing.com price trends,https://housing.com/price-trends/bangalore_karnataka-P38f9yfbk7p3m2h1f,2026-11-12
+Bangalore,Apartments,Bellandur,East,sqft,15160,15160,,Listing avg,Housing.com price trends,https://housing.com/price-trends/bangalore_karnataka-P38f9yfbk7p3m2h1f,2026-11-12
+Bangalore,Apartments,Harlur,East,sqft,14517,14517,,Listing avg,Housing.com price trends,https://housing.com/price-trends/bangalore_karnataka-P38f9yfbk7p3m2h1f,2026-11-12
+Bangalore,Apartments,Banashankari,South,sqft,16021,16021,,Listing avg,Housing.com price trends,https://housing.com/price-trends/bangalore_karnataka-P38f9yfbk7p3m2h1f,2026-11-12
+Bangalore,Apartments,Whitefield,East,sqft,8500,13500,,Listing range,Bangalore Properties blog (Apr 2026),https://bangalorepropertyexpert.blogspot.com/2026/04/bangalore-property-price-report-april.html,2026-04-07
+Bangalore,Apartments,Sarjapur Road,South-East,sqft,11050,11050,,Listing avg,Bangalore Properties blog (Apr 2026),https://bangalorepropertyexpert.blogspot.com/2026/04/bangalore-property-price-report-april.html,2026-04-07
+Bangalore,Apartments,Hoskote,East,sqft,13967,13967,,Listing avg,Housing.com price trends,https://housing.com/price-trends/bangalore_karnataka-P38f9yfbk7p3m2h1f,2026-11-12
+Bangalore,Apartments,Jakkur,North,sqft,13351,13351,,Listing avg,Housing.com price trends,https://housing.com/price-trends/bangalore_karnataka-P38f9yfbk7p3m2h1f,2026-11-12
+Bangalore,Apartments,Devanahalli,North,sqft,11937,11937,,Listing avg,Housing.com price trends,https://housing.com/price-trends/bangalore_karnataka-P38f9yfbk7p3m2h1f,2026-11-12
+Bangalore,Apartments,JP Nagar,South,sqft,11721,14430,,Listing avg (2 sub-areas),Housing.com price trends,https://housing.com/price-trends/bangalore_karnataka-P38f9yfbk7p3m2h1f,2026-11-12
+Bangalore,Apartments,K R Puram,East,sqft,8432,10319,,Listing avg (2 sub-areas),Housing.com price trends,https://housing.com/price-trends/bangalore_karnataka-P38f9yfbk7p3m2h1f,2026-11-12
+Bangalore,Apartments,Kengeri,West,sqft,9851,10235,,Listing avg (2 sub-areas),Housing.com price trends,https://housing.com/price-trends/bangalore_karnataka-P38f9yfbk7p3m2h1f,2026-11-12
+Bangalore,Apartments,Chandapura,South,sqft,8926,8926,,Listing avg,Housing.com price trends,https://housing.com/price-trends/bangalore_karnataka-P38f9yfbk7p3m2h1f,2026-11-12
+Bangalore,Apartments,Kanakapura,South,sqft,8612,8612,,Listing avg,Housing.com price trends,https://housing.com/price-trends/bangalore_karnataka-P38f9yfbk7p3m2h1f,2026-11-12
+Bangalore,Apartments,Electronic City,South,sqft,7550,11896,,Listing avg (sub-areas),Housing.com price trends,https://housing.com/price-trends/bangalore_karnataka-P38f9yfbk7p3m2h1f,2026-11-12
+Bangalore,Plots,Koramangala,South-East,sqft,20000,37000,,Listing range,NoBroker,https://www.nobroker.in/blog/property-rates-in-bangalore/,2026-04-15
+Bangalore,Plots,Rajajinagar,West,sqft,12000,30000,,Listing range,NoBroker,https://www.nobroker.in/blog/property-rates-in-bangalore/,2026-04-15
+Bangalore,Plots,HSR Layout,South-East,sqft,14500,25000,,Listing range,NoBroker,https://www.nobroker.in/blog/property-rates-in-bangalore/,2026-04-15
+Bangalore,Plots,JP Nagar,South,sqft,12000,24000,,Listing range,NoBroker,https://www.nobroker.in/blog/property-rates-in-bangalore/,2026-04-15
+Bangalore,Plots,Hebbal,North,sqft,10000,18000,,Listing range,NoBroker,https://www.nobroker.in/blog/property-rates-in-bangalore/,2026-04-15
+Bangalore,Plots,Bannerghatta Road,South,sqft,10500,16000,,Listing range,NoBroker,https://www.nobroker.in/blog/property-rates-in-bangalore/,2026-04-15
+Bangalore,Plots,Sarjapur Road,South-East,sqft,9000,19000,,Listing range,NoBroker,https://www.nobroker.in/blog/property-rates-in-bangalore/,2026-04-15
+Bangalore,Plots,Electronic City,South,sqft,10000,15000,,Listing range,NoBroker,https://www.nobroker.in/blog/property-rates-in-bangalore/,2026-04-15
+Bangalore,Plots,Yelahanka,North,sqft,10000,14000,,Listing range,NoBroker,https://www.nobroker.in/blog/property-rates-in-bangalore/,2026-04-15
+Bangalore,Plots,Whitefield,East,sqft,12000,13000,,Listing range,NoBroker,https://www.nobroker.in/blog/property-rates-in-bangalore/,2026-04-15
+Bangalore,Plots,K R Puram,East,sqft,6200,15000,,Listing range,NoBroker,https://www.nobroker.in/blog/property-rates-in-bangalore/,2026-04-15
+Bangalore,Plots,Hoskote / Attibele,East,sqft,2000,6000,,Listing range,JLL Homes,https://www.jllhomes.co.in/blogs/plotted-development-in-bengaluru-2025-prices-hotspots-policy-changes-outlook,2025-12-31
+Bangalore,Villas,Kannamangala,East,sqft,10000,22000,,Listing range,Sobha blog,https://www.sobha.com/blog/best-areas-to-buy-villas-in-bangalore/,2026-08-28
+Bangalore,Villas,Hennur Road,North-East,sqft,8800,23000,,Listing range,Sobha blog,https://www.sobha.com/blog/best-areas-to-buy-villas-in-bangalore/,2026-08-28
+Bangalore,Villas,Sarjapur Road,South-East,sqft,3212,29424,,Listing range,Sobha blog,https://www.sobha.com/blog/best-areas-to-buy-villas-in-bangalore/,2026-08-28
+Bangalore,Villas,Whitefield,East,sqft,7500,15000,,Listing range,Sobha blog,https://www.sobha.com/blog/best-areas-to-buy-villas-in-bangalore/,2026-08-28
+Bangalore,Villas,Yelahanka / Jakkur / Hebbal,North,sqft,7000,14000,,Listing range,Sobha blog,https://www.sobha.com/blog/best-areas-to-buy-villas-in-bangalore/,2026-08-28
+Bangalore,Villas,Bannerghatta Road,South,sqft,6800,12500,,Listing range,Sobha blog,https://www.sobha.com/blog/best-areas-to-buy-villas-in-bangalore/,2026-08-28
+Bangalore,Villas,Devanahalli,North,sqft,6000,11500,,Listing range,Sobha blog,https://www.sobha.com/blog/best-areas-to-buy-villas-in-bangalore/,2026-08-28
+Bangalore,Villas,Kanakapura Road,South,sqft,6200,11000,,Listing range,Sobha blog,https://www.sobha.com/blog/best-areas-to-buy-villas-in-bangalore/,2026-08-28
+Bangalore,Villas,Doddaballapura Road,North-West,sqft,5900,10600,,Listing range,Sobha blog,https://www.sobha.com/blog/best-areas-to-buy-villas-in-bangalore/,2026-08-28
+Bangalore,Villas,Electronic City,South,sqft,5500,10500,,Listing range,Sobha blog,https://www.sobha.com/blog/best-areas-to-buy-villas-in-bangalore/,2026-08-28
+Bangalore,Villas,Chandapura,South,sqft,3000,11400,,Listing range,Sobha blog,https://www.sobha.com/blog/best-areas-to-buy-villas-in-bangalore/,2026-08-28
+Bangalore,Villas,Jigani,South,sqft,3000,7200,,Listing range,Sobha blog,https://www.sobha.com/blog/best-areas-to-buy-villas-in-bangalore/,2026-08-28

@@ -1,0 +1,65 @@
+city,locality,status,line,station,note,source_url
+Hyderabad,Jubilee Hills,operational,Blue,Jubilee Hills Check Post / Road No. 5,,https://www.ltmetro.com/
+Hyderabad,Banjara Hills,operational,Blue / Red,Road No. 5 Jubilee Hills (Blue); Irrum Manzil (Red),,https://www.ltmetro.com/
+Hyderabad,HITEC City,operational,Blue,HITEC City,,https://www.ltmetro.com/
+Hyderabad,Gachibowli,near,Blue,Raidurg (terminus),About 2–3 km; Raidurg–Kokapet extension planned in Phase 2A,https://swarajyamag.com/amp/story/news-brief/telangana-assembly-approves-state-takeover-of-hyderabad-metro-phase-1-clears-162-km-expansion-across-eight-new-corridors
+Hyderabad,Financial District,planned,Phase 2A,Raidurg–Kokapet corridor,Awaiting Centre approval,https://swarajyamag.com/amp/story/news-brief/telangana-assembly-approves-state-takeover-of-hyderabad-metro-phase-1-clears-162-km-expansion-across-eight-new-corridors
+Hyderabad,Kokapet,planned,Phase 2A,Raidurg–Kokapet corridor,Awaiting Centre approval,https://swarajyamag.com/amp/story/news-brief/telangana-assembly-approves-state-takeover-of-hyderabad-metro-phase-1-clears-162-km-expansion-across-eight-new-corridors
+Hyderabad,Kokapet (residential),planned,Phase 2A,Raidurg–Kokapet corridor,Awaiting Centre approval,https://swarajyamag.com/amp/story/news-brief/telangana-assembly-approves-state-takeover-of-hyderabad-metro-phase-1-clears-162-km-expansion-across-eight-new-corridors
+Hyderabad,Nallagandla,none,,,,
+Hyderabad,Narsingi,none,,,Raidurg–Kokapet corridor passes nearby (planned),
+Hyderabad,Kondapur,near,Blue,HITEC City,About 2–3 km,https://www.ltmetro.com/
+Hyderabad,Tellapur,none,,,,
+Hyderabad,Kollur,none,,,,
+Hyderabad,Kukatpally / KPHB,operational,Red,KPHB Colony / Kukatpally,,https://www.ltmetro.com/
+Hyderabad,Miyapur,operational,Red,Miyapur (terminus),Miyapur–Patancheru extension planned in Phase 2A,https://www.ltmetro.com/
+Hyderabad,Bachupally,none,,,Miyapur station about 5 km,
+Hyderabad,Kompally,planned,Phase 2B,JBS–Medchal extension,Awaiting Centre approval,https://swarajyamag.com/amp/story/news-brief/telangana-assembly-approves-state-takeover-of-hyderabad-metro-phase-1-clears-162-km-expansion-across-eight-new-corridors
+Hyderabad,Uppal,operational,Blue,Uppal,,https://www.ltmetro.com/
+Hyderabad,LB Nagar,operational,Red,LB Nagar (terminus),LB Nagar–Hayathnagar extension planned in Phase 2A,https://www.ltmetro.com/
+Hyderabad,Shamshabad,planned,Phase 2A,Nagole–Airport corridor,Awaiting Centre approval,https://swarajyamag.com/amp/story/news-brief/telangana-assembly-approves-state-takeover-of-hyderabad-metro-phase-1-clears-162-km-expansion-across-eight-new-corridors
+Hyderabad,Shamshabad (Bahadurguda),planned,Phase 2A,Nagole–Airport corridor,Awaiting Centre approval,https://swarajyamag.com/amp/story/news-brief/telangana-assembly-approves-state-takeover-of-hyderabad-metro-phase-1-clears-162-km-expansion-across-eight-new-corridors
+Hyderabad,Tukkuguda,none,,,Airport–Future City line (Phase 2B) proposed in the area,
+Hyderabad,Mokila - Kollur,none,,,,
+Hyderabad,Shankarpalli,none,,,,
+Hyderabad,Chevella,none,,,,
+Hyderabad,Sangareddy,none,,,,
+Hyderabad,Nizampet,near,Red,JNTU College,About 3 km,https://www.ltmetro.com/
+Hyderabad,Shamirpet,planned,Phase 2B,Shamirpet extension,Awaiting Centre approval,https://swarajyamag.com/amp/story/news-brief/telangana-assembly-approves-state-takeover-of-hyderabad-metro-phase-1-clears-162-km-expansion-across-eight-new-corridors
+Hyderabad,Hayathnagar,planned,Phase 2A,LB Nagar–Hayathnagar corridor,Awaiting Centre approval,https://swarajyamag.com/amp/story/news-brief/telangana-assembly-approves-state-takeover-of-hyderabad-metro-phase-1-clears-162-km-expansion-across-eight-new-corridors
+Hyderabad,Ibrahimpatnam,none,,,,
+Hyderabad,Kollur / Nandigama,none,,,,
+Hyderabad,Yella Reddy Guda,operational,Blue,Yousufguda,,https://www.ltmetro.com/
+Hyderabad,Botanical Garden Road,near,Blue,HITEC City,About 2–3 km,https://www.ltmetro.com/
+Hyderabad,Manchirevula,none,,,,
+Hyderabad,Ilapur Road,none,,,,
+Hyderabad,Chandrayangutta,planned,Phase 2A,MGBS–Chandrayangutta (Old City) corridor,,https://swarajyamag.com/amp/story/news-brief/telangana-assembly-approves-state-takeover-of-hyderabad-metro-phase-1-clears-162-km-expansion-across-eight-new-corridors
+Bangalore,Indiranagar,operational,Purple,Indiranagar,,https://english.bmrc.co.in/
+Bangalore,Jayanagar,operational,Green / Yellow,Jayanagar; RV Road interchange,,https://english.bmrc.co.in/
+Bangalore,Koramangala,near,Yellow,BTM Layout / Central Silk Board,About 2 km; Sarjapur–Hebbal Red line awaiting approval,https://www.theweek.in/wire-updates/national/2026/11/11/metro-rail-pink-line-inauguration-on-nov-13-karnataka-minister-gowda.html
+Bangalore,HSR Layout,upcoming,Blue,HSR Layout (ORR),Silk Board–KR Puram section; trials targeted from Oct 2026,https://businesstoday.in/latest/trends/photo/bengaluru-metros-pink-line-targets-august-15-launch-blue-line-airport-link-and-more-green-line-trains-all-details-548373-2026-08-10
+Bangalore,Bellandur,upcoming,Blue,Bellandur (ORR),Silk Board–KR Puram section,https://businesstoday.in/latest/trends/photo/bengaluru-metros-pink-line-targets-august-15-launch-blue-line-airport-link-and-more-green-line-trains-all-details-548373-2026-08-10
+Bangalore,Harlur,upcoming,Blue,Agara / Iblur (ORR),Silk Board–KR Puram section,https://businesstoday.in/latest/trends/photo/bengaluru-metros-pink-line-targets-august-15-launch-blue-line-airport-link-and-more-green-line-trains-all-details-548373-2026-08-10
+Bangalore,Banashankari,operational,Green,Banashankari,,https://english.bmrc.co.in/
+Bangalore,Whitefield,operational,Purple,Whitefield (Kadugodi),,https://english.bmrc.co.in/
+Bangalore,Sarjapur Road,upcoming,Blue,Iblur (ORR end of Sarjapur Road),Sarjapur–Hebbal Red line awaiting Centre approval,https://www.theweek.in/wire-updates/national/2026/11/11/metro-rail-pink-line-inauguration-on-nov-13-karnataka-minister-gowda.html
+Bangalore,Hoskote,none,,,,
+Bangalore,Jakkur,upcoming,Blue,Jakkur Cross (airport line),KR Puram–Airport section; airport target Dec 2027,https://businesstoday.in/latest/trends/photo/bengaluru-metros-pink-line-targets-august-15-launch-blue-line-airport-link-and-more-green-line-trains-all-details-548373-2026-08-10
+Bangalore,Devanahalli,upcoming,Blue,Airport line,Airport section targeted Dec 2027,https://businesstoday.in/latest/trends/photo/bengaluru-metros-pink-line-targets-august-15-launch-blue-line-airport-link-and-more-green-line-trains-all-details-548373-2026-08-10
+Bangalore,JP Nagar,operational,Green,JP Nagar,Phase 3 Orange line (JP Nagar 4th Phase–Hebbal) planned,https://english.bmrc.co.in/
+Bangalore,K R Puram,operational,Purple,Krishnarajapura,Blue line interchange under construction,https://english.bmrc.co.in/
+Bangalore,Kengeri,operational,Purple,Kengeri,,https://english.bmrc.co.in/
+Bangalore,Chandapura,none,,,Yellow line terminus at Bommasandra about 5 km,
+Bangalore,Kanakapura,operational,Green,Silk Institute / Doddakallasandra,,https://english.bmrc.co.in/
+Bangalore,Electronic City,operational,Yellow,Electronic City,,https://english.bmrc.co.in/
+Bangalore,Rajajinagar,operational,Green,Rajajinagar,,https://english.bmrc.co.in/
+Bangalore,Hebbal,upcoming,Blue,Hebbal (airport line),Phase 3 Orange line to JP Nagar also planned,https://www.theweek.in/wire-updates/national/2026/11/11/metro-rail-pink-line-inauguration-on-nov-13-karnataka-minister-gowda.html
+Bangalore,Bannerghatta Road,operational,Pink,Kalena Agrahara – Jayadeva,Elevated stretch opened to the public 14 Nov 2026,https://www.theweek.in/wire-updates/national/2026/11/11/metro-rail-pink-line-inauguration-on-nov-13-karnataka-minister-gowda.html
+Bangalore,Yelahanka,upcoming,Blue,Yelahanka (airport line),Airport section targeted Dec 2027,https://businesstoday.in/latest/trends/photo/bengaluru-metros-pink-line-targets-august-15-launch-blue-line-airport-link-and-more-green-line-trains-all-details-548373-2026-08-10
+Bangalore,Hoskote / Attibele,none,,,,
+Bangalore,Kannamangala,near,Purple,Kadugodi / Whitefield,About 3–4 km,https://english.bmrc.co.in/
+Bangalore,Hennur Road,upcoming,Pink,Nagawara (underground section),Underground section targeted Mar 2027,https://businesstoday.in/latest/trends/photo/bengaluru-metros-pink-line-targets-august-15-launch-blue-line-airport-link-and-more-green-line-trains-all-details-548373-2026-08-10
+Bangalore,Yelahanka / Jakkur / Hebbal,upcoming,Blue,Hebbal / Jakkur Cross / Yelahanka,Airport section targeted Dec 2027,https://businesstoday.in/latest/trends/photo/bengaluru-metros-pink-line-targets-august-15-launch-blue-line-airport-link-and-more-green-line-trains-all-details-548373-2026-08-10
+Bangalore,Kanakapura Road,operational,Green,Silk Institute / Doddakallasandra,,https://english.bmrc.co.in/
+Bangalore,Doddaballapura Road,none,,,,
+Bangalore,Jigani,none,,,,

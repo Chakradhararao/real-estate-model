@@ -1,0 +1,42 @@
+name: Check property price alerts (Hyderabad + Bangalore)
+
+on:
+  schedule:
+    # Weekly, Monday 03:30 UTC (09:00 IST). Property feeds update monthly or
+    # quarterly, so anything more frequent just re-checks the same data.
+    - cron: "30 3 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write   # to commit the new snapshot back to the repo
+
+jobs:
+  check-property-alerts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests python-dotenv
+
+      - name: Run property alert check
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          RE_THRESHOLD_PCT: "3"
+        run: python -m real_estate.property_alert
+
+      - name: Export data for the web app
+        run: python -m real_estate.export_web_data
+
+      - name: Commit snapshot
+        run: |
+          git config user.name "property-alert-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add real_estate/data/snapshots web/lib/real-estate/data.json; git add real_estate/data/alert_log.jsonl 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "Property snapshot $(date -u +%F)"
+          git push
