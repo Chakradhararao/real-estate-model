@@ -10,6 +10,7 @@ import {
   LandPlot,
   LayoutGrid,
   Search,
+  Sparkles,
   TrainFront,
   TriangleAlert,
   Wallet,
@@ -207,6 +208,202 @@ function summarize(rows: LocalityRow[]) {
   };
 }
 
+// ── "Which to buy" scoring ───────────────────────────────────────────────
+// A transparent screen, not advice: each locality gets 0–100 on value (how far
+// its midpoint sits below the segment's priciest), growth (reported YoY) and
+// metro access, blended by the chosen priority. Soft data loses 10 points.
+type Priority = "balanced" | "value" | "growth" | "metro";
+const PRIORITIES: { key: Priority; label: string }[] = [
+  { key: "balanced", label: "Balanced" },
+  { key: "value", label: "Lower price" },
+  { key: "growth", label: "Growth" },
+  { key: "metro", label: "Metro" },
+];
+const WEIGHTS: Record<Priority, { value: number; growth: number; metro: number }> = {
+  balanced: { value: 0.35, growth: 0.3, metro: 0.35 },
+  value: { value: 0.6, growth: 0.15, metro: 0.25 },
+  growth: { value: 0.2, growth: 0.6, metro: 0.2 },
+  metro: { value: 0.2, growth: 0.2, metro: 0.6 },
+};
+const METRO_SCORE: Record<MetroStatus, number> = { operational: 100, near: 80, upcoming: 65, planned: 35, none: 10 };
+const SOFT_PENALTY = 10;
+const NEUTRAL_GROWTH = 40; // used when no source reports YoY
+
+type Scored = { r: LocalityRow; score: number; value: number; growth: number; metro: number; reasons: string[]; cautions: string[] };
+
+function scoreRows(rows: LocalityRow[], priority: Priority): Scored[] {
+  if (!rows.length) return [];
+  const mids = rows.map(mid);
+  const lo = Math.min(...mids);
+  const hi = Math.max(...mids);
+  const med = median(mids);
+  const w = WEIGHTS[priority];
+  return rows
+    .map((r) => {
+      const m = mid(r);
+      const value = hi === lo ? 50 : ((hi - m) / (hi - lo)) * 100;
+      const growth = r.yoy_pct === null ? NEUTRAL_GROWTH : Math.max(0, Math.min(100, (r.yoy_pct / 20) * 100));
+      const status = r.metro?.status ?? "none";
+      const metro = METRO_SCORE[status];
+      const soft = isSoft(r);
+      const score = Math.max(0, Math.round(w.value * value + w.growth * growth + w.metro * metro - (soft ? SOFT_PENALTY : 0)));
+
+      const reasons: string[] = [];
+      const cautions: string[] = [];
+      const vsMed = med ? ((m - med) / med) * 100 : 0;
+      if (vsMed <= -5) reasons.push(`${Math.abs(vsMed).toFixed(0)}% below the segment median`);
+      else if (vsMed >= 25) cautions.push(`${vsMed.toFixed(0)}% above the segment median`);
+      if (r.yoy_pct !== null && r.yoy_pct >= 8) reasons.push(`+${r.yoy_pct}% reported YoY`);
+      else if (r.yoy_pct !== null && r.yoy_pct < 5) cautions.push(`slow growth (${r.yoy_pct > 0 ? "+" : ""}${r.yoy_pct}% YoY)`);
+      else if (r.yoy_pct === null) cautions.push("no YoY figure reported");
+      if (hasMetro(r.metro)) {
+        if (status === "operational") reasons.push(`${r.metro.line} line station in the locality`);
+        else if (status === "near") reasons.push(`${r.metro.line} line running within ~3 km`);
+        else if (status === "upcoming") reasons.push(`${r.metro.line} line under construction`);
+        else cautions.push(`metro only planned (${r.metro.line}), not approved or built yet`);
+      } else cautions.push("no metro line");
+      if (soft) cautions.push("rate is an estimate, guidance value or developer quote");
+      if (r.price_high > r.price_low * 2) cautions.push("very wide price range");
+      return { r, score, value, growth, metro, reasons, cautions };
+    })
+    .sort((a, b) => b.score - a.score || mid(a.r) - mid(b.r));
+}
+
+function ScoreBadge({ score }: { score: number }) {
+  const tone =
+    score >= 65
+      ? "bg-emerald-600 text-white"
+      : score >= 45
+        ? "bg-amber-500 text-white"
+        : "bg-muted text-muted-foreground";
+  return (
+    <span className={"inline-flex h-7 min-w-9 shrink-0 items-center justify-center rounded-lg px-1.5 text-sm font-semibold tabular-nums " + tone} title="Score out of 100">
+      {score}
+    </span>
+  );
+}
+
+function MiniBar({ label, value }: { label: string; value: number }) {
+  return (
+    <span className="grid grid-cols-[3.2rem_1fr] items-center gap-1.5 text-[11px] text-muted-foreground">
+      {label}
+      <span className="h-1.5 rounded-full bg-muted">
+        <span className="block h-full rounded-full bg-indigo-500/80" style={{ width: `${Math.round(value)}%` }} />
+      </span>
+    </span>
+  );
+}
+
+function BuyShortlist({
+  city,
+  segment,
+  rows,
+  unit,
+  budget,
+  areaNum,
+}: {
+  city: City;
+  segment: Segment;
+  rows: LocalityRow[];
+  unit: Unit;
+  budget: number;
+  areaNum: number;
+}) {
+  const [priority, setPriority] = useState<Priority>("balanced");
+  const [budgetOnly, setBudgetOnly] = useState(false);
+  const [showAll, setShowAll] = useState(false);
+  const scored = useMemo(() => scoreRows(rows, priority), [rows, priority]);
+  const list = budgetOnly && budget > 0 ? scored.filter((x) => x.r.price_low * areaNum <= budget) : scored;
+  const shown = showAll ? list : list.slice(0, 3);
+  const u = unitLabel(unit);
+
+  return (
+    <Card className="border-indigo-500/30 shadow-sm">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base font-bold tracking-tight">
+          <Sparkles className="size-4 text-indigo-600 dark:text-indigo-400" /> Which to buy · {segment} in {city}
+        </CardTitle>
+        <CardDescription className="text-xs">
+          Localities ranked by a score out of 100 that blends price, reported yearly growth and metro access. Pick what matters most to you.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <Toggle label="Priority" options={PRIORITIES} value={priority} onChange={setPriority} />
+          {budget > 0 && (
+            <label className="inline-flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground" htmlFor="re-budget-only">
+              <input id="re-budget-only" type="checkbox" checked={budgetOnly} onChange={(e) => setBudgetOnly(e.target.checked)} className="size-3.5 accent-indigo-600" />
+              Only within my budget ({lakhOrCrore(budget)} for {areaNum.toLocaleString("en-IN")} {u})
+            </label>
+          )}
+        </div>
+
+        {shown.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Nothing fits that budget. Change the budget or size in “What fits my budget” below.</p>
+        ) : (
+          <ol className="grid gap-3 lg:grid-cols-3">
+            {shown.map((x, i) => (
+              <li key={x.r.locality} className={"flex min-w-0 flex-col gap-2 rounded-xl border p-3 " + (i === 0 && !showAll ? "border-indigo-500/50 bg-indigo-50/50 dark:bg-indigo-950/20" : "bg-card")}>
+                <div className="flex items-start justify-between gap-2">
+                  <span className="min-w-0">
+                    <span className="block text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                      {i === 0 ? "Top pick" : `#${i + 1}`}
+                    </span>
+                    <span className="flex min-w-0 items-center gap-1.5">
+                      <span className="truncate font-semibold">{x.r.locality}</span>
+                      <MetroIcon metro={x.r.metro} />
+                    </span>
+                    <span className="block text-xs text-muted-foreground tabular-nums">
+                      {x.r.zone} · {inr(mid(x.r))}/{u}
+                    </span>
+                  </span>
+                  <ScoreBadge score={x.score} />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <MiniBar label="Price" value={x.value} />
+                  <MiniBar label="Growth" value={x.growth} />
+                  <MiniBar label="Metro" value={x.metro} />
+                </div>
+                {x.reasons.length > 0 && (
+                  <ul className="flex flex-col gap-0.5 text-xs">
+                    {x.reasons.map((t) => (
+                      <li key={t} className="flex gap-1.5">
+                        <span className="text-emerald-600 dark:text-emerald-400">+</span>
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {x.cautions.length > 0 && (
+                  <ul className="flex flex-col gap-0.5 text-xs text-muted-foreground">
+                    {x.cautions.map((t) => (
+                      <li key={t} className="flex gap-1.5">
+                        <span className="text-amber-600 dark:text-amber-400">!</span>
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ol>
+        )}
+
+        {list.length > 3 && (
+          <button type="button" onClick={() => setShowAll((v) => !v)} className="self-start text-xs font-medium text-indigo-700 hover:underline dark:text-indigo-300">
+            {showAll ? "Show top 3 only" : `Show all ${list.length} ranked`}
+          </button>
+        )}
+
+        <p className="text-[11px] text-muted-foreground">
+          This is a screen built from asking prices, not financial advice. It can&apos;t see title and legal status, builder track record, water, flooding
+          or resale demand. Before paying anything, check the RERA registration, get the title verified by a lawyer and visit the site.
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
 const SEGMENT_BLURB: Record<Segment, string> = {
   Plots: "Open plots and layouts. Hyderabad quotes land per sq yd; Bangalore per sq ft.",
   Apartments: "Flats in apartment complexes, per sq ft of saleable area.",
@@ -326,6 +523,7 @@ function Overview({ city, onOpen }: { city: City; onOpen: (s: Segment) => void }
       <div className="grid gap-3 sm:grid-cols-2">
         {SEGMENTS.map(({ key, label, icon: Icon }) => {
           const s = summarize(segRowsFor(city, key));
+          const top = scoreRows(segRowsFor(city, key), "balanced")[0];
           return (
             <button
               key={key}
@@ -368,6 +566,14 @@ function Overview({ city, onOpen }: { city: City; onOpen: (s: Segment) => void }
                       </span>
                     </span>
                   </span>
+                  {top && (
+                    <span className="flex items-center gap-1.5 border-t pt-2 text-xs">
+                      <Sparkles className="size-3.5 shrink-0 text-indigo-600 dark:text-indigo-400" />
+                      <span className="text-muted-foreground">Top pick</span>
+                      <span className="truncate font-medium">{top.r.locality}</span>
+                      <span className="ml-auto tabular-nums text-muted-foreground">score {top.score}</span>
+                    </span>
+                  )}
                 </>
               )}
             </button>
@@ -633,6 +839,8 @@ function SegmentDashboard({ city, segment, onCity }: { city: City; segment: Segm
               </span>
             </p>
           )}
+
+          <BuyShortlist city={city} segment={segment} rows={segRows} unit={unit} budget={budget} areaNum={areaNum} />
 
           <div className="flex flex-col gap-2">
             <div className="flex flex-wrap items-center gap-2">
