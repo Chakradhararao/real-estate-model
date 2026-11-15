@@ -1,6 +1,19 @@
 "use client";
 
-import { Building, Building2, ExternalLink, Home, LandPlot, Search, TrainFront, TriangleAlert, Wallet } from "lucide-react";
+import {
+  ArrowUpDown,
+  Building,
+  Building2,
+  ChevronRight,
+  ExternalLink,
+  Home,
+  LandPlot,
+  LayoutGrid,
+  Search,
+  TrainFront,
+  TriangleAlert,
+  Wallet,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -70,7 +83,6 @@ function MetroLegend() {
 }
 
 const CITY_KEY = "re-city";
-const SEGMENT_KEY = "re-segment";
 
 const inr = (n: number) => "₹" + Math.round(n).toLocaleString("en-IN");
 const unitLabel = (u: Unit) => (u === "sqyd" ? "sq yd" : "sq ft");
@@ -84,6 +96,13 @@ function median(values: number[]) {
   const s = [...values].sort((a, b) => a - b);
   const m = Math.floor(s.length / 2);
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+
+// Short form for tight spots: ₹18K, ₹1.5L.
+function inrShort(n: number) {
+  if (n >= 1e5) return "₹" + (n / 1e5).toFixed(n >= 1e6 ? 0 : 1).replace(/\.0$/, "") + "L";
+  if (n >= 1e3) return "₹" + (n / 1e3).toFixed(n >= 1e4 ? 0 : 1).replace(/\.0$/, "") + "K";
+  return inr(n);
 }
 
 function lakhOrCrore(rupees: number) {
@@ -153,407 +172,216 @@ function YoY({ value }: { value: number | null }) {
   );
 }
 
+// ── Tabs: one overview plus a full rates dashboard per segment ──────────
+type TabKey = "overview" | "plots" | "apartments" | "villas" | "houses";
+const TAB_SEGMENT: Record<Exclude<TabKey, "overview">, Segment> = {
+  plots: "Plots",
+  apartments: "Apartments",
+  villas: "Villas",
+  houses: "Independent Houses",
+};
+const SEGMENT_TAB = Object.fromEntries(Object.entries(TAB_SEGMENT).map(([k, v]) => [v, k])) as Record<Segment, TabKey>;
+const TABS: { key: TabKey; label: string; icon: typeof Home }[] = [
+  { key: "overview", label: "Overview", icon: LayoutGrid },
+  ...SEGMENTS.map((s) => ({ key: SEGMENT_TAB[s.key], label: s.label, icon: s.icon })),
+];
+const isTab = (v: string): v is TabKey => TABS.some((t) => t.key === v);
+
+const segRowsFor = (city: City, segment: Segment) => DATA.rows.filter((r) => r.city === city && r.segment === segment);
+const onMetro = (r: LocalityRow) => r.metro?.status === "operational" || r.metro?.status === "near";
+
+function summarize(rows: LocalityRow[]) {
+  const yoys = rows.map((r) => r.yoy_pct).filter((v): v is number => v !== null);
+  const byMid = [...rows].sort((a, b) => mid(b) - mid(a));
+  return {
+    count: rows.length,
+    median: median(rows.map(mid)),
+    low: rows.length ? Math.min(...rows.map((r) => r.price_low)) : 0,
+    high: rows.length ? Math.max(...rows.map((r) => r.price_high)) : 0,
+    avgYoy: yoys.length ? yoys.reduce((s, v) => s + v, 0) / yoys.length : null,
+    yoyCount: yoys.length,
+    metro: rows.filter(onMetro).length,
+    top: byMid[0],
+    cheapest: byMid[byMid.length - 1],
+    unit: (rows[0]?.unit ?? "sqft") as Unit,
+  };
+}
+
+const SEGMENT_BLURB: Record<Segment, string> = {
+  Plots: "Open plots and layouts. Hyderabad quotes land per sq yd; Bangalore per sq ft.",
+  Apartments: "Flats in apartment complexes, per sq ft of saleable area.",
+  Villas: "Gated-community villas, per sq ft of built-up area.",
+  "Independent Houses": "Standalone houses on their own plot, per sq ft of built-up area.",
+};
+
 export default function RealEstatePanel() {
   const [city, setCity] = useState<City>("Hyderabad");
-  const [segment, setSegment] = useState<Segment>("Apartments");
-  const [sort, setSort] = useState<SortKey>("price");
-  const [zone, setZone] = useState<string>("All");
-  const [query, setQuery] = useState("");
-  const [metroFilter, setMetroFilter] = useState<MetroFilter>("any");
-  const [selected, setSelected] = useState<string | null>(null);
-  const [budgetLakh, setBudgetLakh] = useState("90");
-  const [area, setArea] = useState("");
+  const [tab, setTab] = useState<TabKey>("overview");
 
-  // Restore the last city/segment, same as the dashboard tab.
+  // Restore the saved city, and the tab from the link (#plots, #villas…).
   useEffect(() => {
     try {
       const c = localStorage.getItem(CITY_KEY);
-      const s = localStorage.getItem(SEGMENT_KEY);
       // eslint-disable-next-line react-hooks/set-state-in-effect -- restoring a saved preference after mount
       if (c === "Hyderabad" || c === "Bangalore") setCity(c);
-      if (SEGMENTS.some((x) => x.key === s)) setSegment(s as Segment);
     } catch {
       /* storage unavailable — defaults are fine */
     }
+    const fromHash = () => {
+      const h = window.location.hash.slice(1);
+      if (isTab(h)) setTab(h);
+    };
+    fromHash();
+    window.addEventListener("hashchange", fromHash);
+    return () => window.removeEventListener("hashchange", fromHash);
   }, []);
 
   function pickCity(c: City) {
     setCity(c);
-    setZone("All");
-    setSelected(null);
     try {
       localStorage.setItem(CITY_KEY, c);
     } catch {
       /* ignore */
     }
   }
-  function pickSegment(s: Segment) {
-    setSegment(s);
-    setZone("All");
-    setSelected(null);
-    setArea("");
-    try {
-      localStorage.setItem(SEGMENT_KEY, s);
-    } catch {
-      /* ignore */
-    }
+  function openTab(t: TabKey) {
+    setTab(t);
+    if (window.location.hash.slice(1) !== t) window.location.hash = t;
   }
-
-  const segRows = useMemo(() => DATA.rows.filter((r) => r.city === city && r.segment === segment), [city, segment]);
-  const unit: Unit = segRows[0]?.unit ?? "sqft";
-  const zones = useMemo(() => ["All", ...Array.from(new Set(segRows.map((r) => r.zone))).sort()], [segRows]);
-
-  const rows = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const metroOk = (r: LocalityRow) => {
-      const s = r.metro?.status ?? "none";
-      if (metroFilter === "now") return s === "operational" || s === "near";
-      if (metroFilter === "coming") return s === "upcoming" || s === "planned";
-      return true;
-    };
-    const list = segRows.filter(
-      (r) =>
-        (zone === "All" || r.zone === zone) &&
-        metroOk(r) &&
-        (!q || r.locality.toLowerCase().includes(q) || r.zone.toLowerCase().includes(q)),
-    );
-    return list.sort((a, b) => {
-      if (sort === "name") return a.locality.localeCompare(b.locality);
-      if (sort === "yoy") return (b.yoy_pct ?? -Infinity) - (a.yoy_pct ?? -Infinity);
-      return mid(b) - mid(a);
-    });
-  }, [segRows, zone, query, sort, metroFilter]);
-
-  const stats = useMemo(() => {
-    const mids = segRows.map(mid);
-    const yoys = segRows.map((r) => r.yoy_pct).filter((v): v is number => v !== null);
-    const byMid = [...segRows].sort((a, b) => mid(b) - mid(a));
-    return {
-      median: median(mids),
-      count: segRows.length,
-      avgYoy: yoys.length ? yoys.reduce((s, v) => s + v, 0) / yoys.length : null,
-      yoyCount: yoys.length,
-      top: byMid[0],
-      cheapest: byMid[byMid.length - 1],
-    };
-  }, [segRows]);
-
-  const scaleMax = Math.max(1, ...rows.map((r) => r.price_high));
-  const detail = rows.find((r) => r.locality === selected) ?? null;
-
-  // Budget finder: which localities fit a budget for a given size.
-  const defaultArea = segment === "Plots" ? (unit === "sqyd" ? 200 : 1200) : segment === "Apartments" ? 1500 : 2400;
-  const areaNum = Number(area) > 0 ? Number(area) : defaultArea;
-  const budget = Number(budgetLakh) > 0 ? Number(budgetLakh) * 1e5 : 0;
-  const fits = useMemo(
-    () =>
-      segRows
-        .map((r) => ({ r, low: r.price_low * areaNum, high: r.price_high * areaNum }))
-        .filter((x) => budget > 0 && x.low <= budget)
-        .sort((a, b) => b.low - a.low),
-    [segRows, areaNum, budget],
-  );
-
-  // City comparison on a common ₹/sq ft basis.
-  const compare = useMemo(
-    () =>
-      SEGMENTS.map(({ key, label }) => {
-        const med = (c: City) => median(DATA.rows.filter((r) => r.city === c && r.segment === key).map(perSqft));
-        return { key, label, hyd: med("Hyderabad"), blr: med("Bangalore") };
-      }),
-    [],
-  );
-  const compareMax = Math.max(1, ...compare.flatMap((c) => [c.hyd, c.blr]));
-
-  const changes = DATA.changes.filter((c) => c.city === city && c.triggered);
-  const softCount = segRows.filter(isSoft).length;
 
   return (
     <div className="flex min-w-0 flex-col gap-6 [&>*]:min-w-0">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="min-w-0">
-          <h2 className="text-lg font-semibold tracking-tight">Real Estate · Hyderabad &amp; Bangalore</h2>
-          <p className="text-sm text-muted-foreground">
-            Asking-price ranges by locality. Snapshot {formatDate(DATA.snapshot)} · alerts at ±{DATA.threshold_pct}% between snapshots.
-          </p>
-        </div>
+        <p className="min-w-0 text-sm text-muted-foreground">
+          Asking-price ranges by locality · snapshot {formatDate(DATA.snapshot)} · alerts at ±{DATA.threshold_pct}% between snapshots
+        </p>
         <Toggle label="City" options={DATA.cities.map((c) => ({ key: c, label: c }))} value={city} onChange={pickCity} />
       </div>
 
-      <div
+      <nav
         role="tablist"
-        aria-label="Property segment"
-        className="flex w-full max-w-full gap-1 overflow-x-auto rounded-xl border bg-background/70 p-1 shadow-sm [scrollbar-width:none] sm:inline-flex sm:w-fit sm:flex-wrap [&::-webkit-scrollbar]:hidden"
+        aria-label="Dashboards"
+        className="sticky top-0 z-20 -mx-3 flex gap-1 overflow-x-auto border-b bg-background/90 px-3 backdrop-blur [scrollbar-width:none] sm:mx-0 sm:rounded-xl sm:border sm:p-1 sm:shadow-sm [&::-webkit-scrollbar]:hidden"
       >
-        {SEGMENTS.map(({ key, label, icon: Icon }) => {
-          const active = segment === key;
-          const n = DATA.rows.filter((r) => r.city === city && r.segment === key).length;
+        {TABS.map(({ key, label, icon: Icon }) => {
+          const active = tab === key;
+          const n = key === "overview" ? null : segRowsFor(city, TAB_SEGMENT[key]).length;
           return (
             <button
               key={key}
               type="button"
               role="tab"
+              id={`tab-${key}`}
               aria-selected={active}
-              onClick={() => pickSegment(key)}
+              aria-controls={`panel-${key}`}
+              onClick={() => openTab(key)}
               className={
-                "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors " +
-                (active ? "bg-foreground text-background shadow" : "text-muted-foreground hover:bg-muted hover:text-foreground")
+                "flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2.5 text-sm font-medium transition-colors sm:rounded-lg sm:border-b-0 " +
+                (active
+                  ? "border-foreground text-foreground sm:bg-foreground sm:text-background sm:shadow"
+                  : "border-transparent text-muted-foreground hover:text-foreground sm:hover:bg-muted")
               }
             >
               <Icon className="size-4" />
               {label}
-              <span className={"rounded-full px-1.5 text-[11px] tabular-nums " + (active ? "bg-background/20" : "bg-muted")}>{n}</span>
+              {n !== null && (
+                <span className={"rounded-full px-1.5 text-[11px] tabular-nums " + (active ? "bg-muted sm:bg-background/20" : "bg-muted")}>{n}</span>
+              )}
+            </button>
+          );
+        })}
+      </nav>
+
+      <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="flex min-w-0 flex-col gap-6 [&>*]:min-w-0">
+        {tab === "overview" ? (
+          <Overview city={city} onOpen={(s) => openTab(SEGMENT_TAB[s])} />
+        ) : (
+          <SegmentDashboard key={`${tab}-${city}`} city={city} segment={TAB_SEGMENT[tab]} onCity={pickCity} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Overview tab ─────────────────────────────────────────────────────────
+function Overview({ city, onOpen }: { city: City; onOpen: (s: Segment) => void }) {
+  const compare = useMemo(
+    () =>
+      SEGMENTS.map(({ key, label }) => {
+        const med = (c: City) => median(segRowsFor(c, key).map(perSqft));
+        return { key, label, hyd: med("Hyderabad"), blr: med("Bangalore") };
+      }),
+    [],
+  );
+  const compareMax = Math.max(1, ...compare.flatMap((c) => [c.hyd, c.blr]));
+  const changes = DATA.changes.filter((c) => c.city === city && c.triggered);
+
+  return (
+    <>
+      <div>
+        <h2 className="text-lg font-semibold tracking-tight">{city} at a glance</h2>
+        <p className="text-sm text-muted-foreground">Open a segment for its full rates dashboard.</p>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        {SEGMENTS.map(({ key, label, icon: Icon }) => {
+          const s = summarize(segRowsFor(city, key));
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onOpen(key)}
+              className="group flex min-w-0 flex-col gap-3 rounded-xl border bg-card p-4 text-left shadow-sm transition-colors hover:border-foreground/40"
+            >
+              <span className="flex items-center justify-between gap-2">
+                <span className="flex items-center gap-2 font-semibold">
+                  <span className="flex size-8 items-center justify-center rounded-lg bg-linear-to-br from-emerald-500 to-indigo-600 text-white">
+                    <Icon className="size-4" />
+                  </span>
+                  {label}
+                </span>
+                <ChevronRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+              </span>
+              {s.count === 0 ? (
+                <span className="text-sm text-muted-foreground">No data yet</span>
+              ) : (
+                <>
+                  <span className="flex items-baseline gap-1.5">
+                    <span className="text-2xl font-semibold tabular-nums">{inr(s.median)}</span>
+                    <span className="text-xs text-muted-foreground">/ {unitLabel(s.unit)} median</span>
+                  </span>
+                  <span className="grid grid-cols-3 gap-2 text-xs">
+                    <span>
+                      <span className="block text-muted-foreground">Range</span>
+                      <span className="tabular-nums">
+                        {inr(s.low)}–{inr(s.high)}
+                      </span>
+                    </span>
+                    <span>
+                      <span className="block text-muted-foreground">Avg YoY</span>
+                      <YoY value={s.avgYoy === null ? null : Number(s.avgYoy.toFixed(1))} />
+                    </span>
+                    <span>
+                      <span className="block text-muted-foreground">On metro</span>
+                      <span className="tabular-nums">
+                        {s.metro} of {s.count}
+                      </span>
+                    </span>
+                  </span>
+                </>
+              )}
             </button>
           );
         })}
       </div>
 
-      {segRows.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 text-center text-sm text-muted-foreground">
-            No {segment.toLowerCase()} data for {city} yet. Add rows to real_estate/data/localities.csv and re-export.
-          </CardContent>
-        </Card>
-      ) : (
-        <>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <Stat label="Median rate" value={inr(stats.median)} note={`per ${unitLabel(unit)}, range midpoint`} />
-            <Stat label="Avg YoY" value={stats.avgYoy === null ? "n/a" : `${stats.avgYoy > 0 ? "+" : ""}${stats.avgYoy.toFixed(1)}%`} note={stats.yoyCount ? `${stats.yoyCount} of ${stats.count} localities report it` : "no source reports YoY yet"} />
-            <Stat label="Priciest" value={stats.top?.locality ?? "—"} note={stats.top ? `${inr(mid(stats.top))} / ${unitLabel(unit)}` : undefined} />
-            <Stat label="Most affordable" value={stats.cheapest?.locality ?? "—"} note={stats.cheapest ? `${inr(mid(stats.cheapest))} / ${unitLabel(unit)}` : undefined} />
-          </div>
-
-          {(softCount > 0 || segment === "Independent Houses") && (
-            <p className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
-              <TriangleAlert className="mt-0.5 size-3.5 shrink-0" />
-              <span>
-                {softCount} of {segRows.length} rows here are estimates, government guidance values or developer quotes (marked in amber).
-                {segment === "Independent Houses" && city === "Bangalore" &&
-                  " Bangalore houses are modelled: plot rate on a 30×40 site + G+1 build at ₹2,500/sq ft, per 2,400 sq ft built-up."}
-                {unit === "sqyd" && " Hyderabad plots are quoted per sq yd (1 sq yd = 9 sq ft)."}
-              </span>
-            </p>
-          )}
-
-          <Card className="shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-base font-bold tracking-tight">Price range by locality</CardTitle>
-              <CardDescription className="text-xs">
-                Bar spans low to high asking rate per {unitLabel(unit)}; the dot is the midpoint. Tap a locality for details.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="relative min-w-40 flex-1 sm:max-w-60">
-                  <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="re-search"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search locality"
-                    className="h-8 pl-8 text-sm"
-                    aria-label="Search locality"
-                  />
-                </div>
-                <Toggle label="Sort" options={SORTS} value={sort} onChange={setSort} />
-                <Toggle label="Metro" options={METRO_FILTERS} value={metroFilter} onChange={setMetroFilter} />
-              </div>
-              <MetroLegend />
-              <div className="flex flex-wrap gap-1.5" role="group" aria-label="Zone">
-                {zones.map((z) => (
-                  <button
-                    key={z}
-                    type="button"
-                    aria-pressed={zone === z}
-                    onClick={() => setZone(z)}
-                    className={
-                      "rounded-full border px-2.5 py-0.5 text-xs transition-colors " +
-                      (zone === z ? "border-foreground bg-foreground text-background" : "text-muted-foreground hover:bg-muted")
-                    }
-                  >
-                    {z}
-                  </button>
-                ))}
-              </div>
-
-              {rows.length === 0 ? (
-                <p className="py-6 text-center text-sm text-muted-foreground">No localities match.</p>
-              ) : (
-                <ul className="flex flex-col">
-                  {rows.map((r) => {
-                    const left = (r.price_low / scaleMax) * 100;
-                    const width = Math.max(1.2, ((r.price_high - r.price_low) / scaleMax) * 100);
-                    const dot = (mid(r) / scaleMax) * 100;
-                    const open = selected === r.locality;
-                    const soft = isSoft(r);
-                    return (
-                      <li key={r.locality} className="border-t first:border-t-0">
-                        <button
-                          type="button"
-                          aria-expanded={open}
-                          onClick={() => setSelected(open ? null : r.locality)}
-                          className="grid w-full grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1.5 rounded-md px-1 py-2 text-left hover:bg-muted/60 sm:grid-cols-[11rem_1fr_9rem]"
-                        >
-                          <span className="min-w-0">
-                            <span className="flex min-w-0 items-center gap-1.5">
-                              <span className="truncate text-sm font-medium">{r.locality}</span>
-                              <MetroIcon metro={r.metro} />
-                            </span>
-                            <span className="block truncate text-[11px] text-muted-foreground">
-                              {r.zone}
-                              {hasMetro(r.metro) && (
-                                <span className={METRO_STYLE[r.metro.status].text}> · {r.metro.line}</span>
-                              )}
-                            </span>
-                          </span>
-                          <span className="relative order-last col-span-2 h-2.5 rounded-full bg-muted sm:order-none sm:col-span-1" aria-hidden>
-                            <span
-                              className={"absolute inset-y-0 rounded-full " + (soft ? "bg-amber-400/70" : "bg-linear-to-r from-emerald-500/70 to-indigo-500/70")}
-                              style={{ left: `${left}%`, width: `${width}%` }}
-                            />
-                            <span
-                              className={"absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background " + (soft ? "bg-amber-500" : "bg-indigo-600")}
-                              style={{ left: `${dot}%` }}
-                            />
-                          </span>
-                          <span className="text-right text-xs tabular-nums">
-                            <span className="block font-semibold text-foreground">{inr(mid(r))}</span>
-                            <span className="block text-muted-foreground">
-                              <YoY value={r.yoy_pct} /> YoY
-                            </span>
-                          </span>
-                        </button>
-                        {open && detail && (
-                          <div className="mb-2 grid gap-2 rounded-lg border bg-muted/30 p-3 text-xs sm:grid-cols-2">
-                            <div>
-                              <div className="text-muted-foreground">Range</div>
-                              <div className="font-medium tabular-nums">
-                                {detail.price_low === detail.price_high
-                                  ? `${inr(detail.price_low)} / ${unitLabel(detail.unit)}`
-                                  : `${inr(detail.price_low)} – ${inr(detail.price_high)} / ${unitLabel(detail.unit)}`}
-                              </div>
-                            </div>
-                            <div>
-                              <div className="text-muted-foreground">Basis</div>
-                              <div className={"font-medium " + (isSoft(detail) ? "text-amber-700 dark:text-amber-300" : "")}>{detail.basis}</div>
-                            </div>
-                            <div>
-                              <div className="text-muted-foreground">Typical ticket</div>
-                              <div className="font-medium tabular-nums">
-                                {lakhOrCrore(detail.price_low * defaultArea)} – {lakhOrCrore(detail.price_high * defaultArea)}
-                                <span className="font-normal text-muted-foreground"> for {defaultArea.toLocaleString("en-IN")} {unitLabel(detail.unit)}</span>
-                              </div>
-                            </div>
-                            <div className="sm:col-span-2">
-                              <div className="text-muted-foreground">Metro</div>
-                              {hasMetro(detail.metro) ? (
-                                <div className="flex items-start gap-1.5">
-                                  <MetroIcon metro={detail.metro} size="md" />
-                                  <span>
-                                    <span className={"font-medium " + METRO_STYLE[detail.metro.status].text}>
-                                      {METRO_STYLE[detail.metro.status].label} · {detail.metro.line} line
-                                    </span>
-                                    <span className="text-foreground"> — {detail.metro.station}</span>
-                                    {detail.metro.note && <span className="block text-muted-foreground">{detail.metro.note}</span>}
-                                  </span>
-                                </div>
-                              ) : (
-                                <div className="text-muted-foreground">No metro line yet{detail.metro?.note ? ` · ${detail.metro.note}` : ""}</div>
-                              )}
-                            </div>
-                            <div>
-                              <div className="text-muted-foreground">Source · as of {formatDate(detail.as_of)}</div>
-                              <a href={detail.source_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-medium underline-offset-2 hover:underline">
-                                {detail.source}
-                                <ExternalLink className="size-3" />
-                              </a>
-                            </div>
-                          </div>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-              <p className="text-[11px] text-muted-foreground">
-                Scale 0 – {inr(scaleMax)} per {unitLabel(unit)}. Amber = estimate, guidance value or developer quote.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base font-bold tracking-tight">
-                <Wallet className="size-4" /> What fits my budget
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Localities in {city} where the low end of the range fits, for the size you enter.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-3">
-              <div className="flex flex-wrap items-end gap-3">
-                <label className="flex flex-col gap-1 text-xs text-muted-foreground" htmlFor="re-budget">
-                  Budget (₹ lakh)
-                  <Input id="re-budget" inputMode="decimal" value={budgetLakh} onChange={(e) => setBudgetLakh(e.target.value)} className="h-8 w-32 text-sm tabular-nums" />
-                </label>
-                <label className="flex flex-col gap-1 text-xs text-muted-foreground" htmlFor="re-area">
-                  Size ({unitLabel(unit)}{segment === "Plots" ? "" : " built-up"})
-                  <Input id="re-area" inputMode="numeric" value={area} placeholder={String(defaultArea)} onChange={(e) => setArea(e.target.value)} className="h-8 w-32 text-sm tabular-nums" />
-                </label>
-                <p className="pb-1.5 text-xs text-muted-foreground">
-                  {budget > 0 ? `${fits.length} of ${segRows.length} localities` : "Enter a budget"}
-                </p>
-              </div>
-              {budget > 0 && fits.length === 0 && (
-                <p className="text-sm text-muted-foreground">Nothing fits yet. Try a smaller size or a bigger budget.</p>
-              )}
-              {fits.length > 0 && (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="text-left text-xs text-muted-foreground">
-                        <th className="pb-2 font-medium">Locality</th>
-                        <th className="pb-2 text-right font-medium">Estimated cost</th>
-                        <th className="pb-2 text-right font-medium">Headroom</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {fits.map(({ r, low, high }) => (
-                        <tr key={r.locality} className="border-t">
-                          <td className="py-2">
-                            <div className="flex items-center gap-1.5 font-medium">
-                              {r.locality}
-                              <MetroIcon metro={r.metro} />
-                            </div>
-                            <div className="text-xs text-muted-foreground">{r.zone}</div>
-                          </td>
-                          <td className="py-2 text-right tabular-nums">
-                            {low === high ? lakhOrCrore(low) : `${lakhOrCrore(low)} – ${lakhOrCrore(high)}`}
-                          </td>
-                          <td className="py-2 text-right tabular-nums">
-                            {high <= budget ? (
-                              <span className="text-emerald-600 dark:text-emerald-400">Whole range fits</span>
-                            ) : (
-                              <span className="text-amber-700 dark:text-amber-300">Low end only</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-              <p className="text-[11px] text-muted-foreground">Asking price only. Add stamp duty and registration (roughly 6–8% in both states), GST on under-construction homes, and interiors.</p>
-            </CardContent>
-          </Card>
-        </>
-      )}
-
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="text-base font-bold tracking-tight">Hyderabad vs Bangalore</CardTitle>
-            <CardDescription className="text-xs">Median midpoint per sq ft, by segment (Hyderabad plots converted from sq yd). Each city tracks different localities, so treat this as a rough guide.</CardDescription>
+            <CardDescription className="text-xs">
+              Median midpoint per sq ft, by segment (Hyderabad plots converted from sq yd). Each city tracks different localities, so treat this as a rough guide.
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
             {compare.map((c) => (
@@ -596,7 +424,9 @@ export default function RealEstatePanel() {
           <CardContent>
             {changes.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                {DATA.compared ? "No locality crossed the threshold." : `Baseline saved on ${formatDate(DATA.snapshot)}. The weekly job sends Telegram alerts from the next snapshot.`}
+                {DATA.compared
+                  ? "No locality crossed the threshold."
+                  : `Baseline saved on ${formatDate(DATA.snapshot)}. The weekly job sends Telegram alerts from the next snapshot.`}
               </p>
             ) : (
               <ul className="flex flex-col divide-y text-sm">
@@ -640,7 +470,7 @@ export default function RealEstatePanel() {
                 <tr key={f.name} className="border-t align-top">
                   <td className="py-2 pr-3 font-medium">{f.name}</td>
                   <td className="py-2 pr-3">{f.covers}</td>
-                  <td className="py-2 pr-3 whitespace-nowrap">{f.cadence}</td>
+                  <td className="whitespace-nowrap py-2 pr-3">{f.cadence}</td>
                   <td className="py-2">{f.use_for}</td>
                 </tr>
               ))}
@@ -648,6 +478,464 @@ export default function RealEstatePanel() {
           </table>
         </div>
       </details>
-    </div>
+    </>
+  );
+}
+
+// ── One segment's rates dashboard ────────────────────────────────────────
+type TableSort = { key: "locality" | "zone" | "price_low" | "price_high" | "mid" | "yoy_pct"; dir: 1 | -1 };
+
+function SortTh({
+  k,
+  label,
+  num,
+  sort,
+  onSort,
+}: {
+  k: TableSort["key"];
+  label: string;
+  num?: boolean;
+  sort: TableSort;
+  onSort: (k: TableSort["key"]) => void;
+}) {
+  const active = sort.key === k;
+  return (
+    <th className={"whitespace-nowrap pb-2 font-medium " + (num ? "text-right" : "text-left")} aria-sort={active ? (sort.dir === 1 ? "ascending" : "descending") : "none"}>
+      <button type="button" onClick={() => onSort(k)} className={"inline-flex items-center gap-1 hover:text-foreground " + (active ? "text-foreground" : "")}>
+        {label}
+        <ArrowUpDown className={"size-3 " + (active ? "opacity-100" : "opacity-40")} />
+      </button>
+    </th>
+  );
+}
+
+function SegmentDashboard({ city, segment, onCity }: { city: City; segment: Segment; onCity: (c: City) => void }) {
+  const [sort, setSort] = useState<SortKey>("price");
+  const [zone, setZone] = useState<string>("All");
+  const [query, setQuery] = useState("");
+  const [metroFilter, setMetroFilter] = useState<MetroFilter>("any");
+  const [selected, setSelected] = useState<string | null>(null);
+  const [tableSort, setTableSort] = useState<TableSort>({ key: "mid", dir: -1 });
+  const [budgetLakh, setBudgetLakh] = useState("90");
+  const [area, setArea] = useState("");
+
+  const segRows = useMemo(() => segRowsFor(city, segment), [city, segment]);
+  const unit: Unit = segRows[0]?.unit ?? "sqft";
+  const u = unitLabel(unit);
+  const zones = useMemo(() => ["All", ...Array.from(new Set(segRows.map((r) => r.zone))).sort()], [segRows]);
+  const stats = useMemo(() => summarize(segRows), [segRows]);
+  const segInfo = SEGMENTS.find((s) => s.key === segment)!;
+  const SegIcon = segInfo.icon;
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const metroOk = (r: LocalityRow) => {
+      const s = r.metro?.status ?? "none";
+      if (metroFilter === "now") return s === "operational" || s === "near";
+      if (metroFilter === "coming") return s === "upcoming" || s === "planned";
+      return true;
+    };
+    return segRows.filter(
+      (r) => (zone === "All" || r.zone === zone) && metroOk(r) && (!q || r.locality.toLowerCase().includes(q) || r.zone.toLowerCase().includes(q)),
+    );
+  }, [segRows, zone, query, metroFilter]);
+
+  const rows = useMemo(
+    () =>
+      [...filtered].sort((a, b) => {
+        if (sort === "name") return a.locality.localeCompare(b.locality);
+        if (sort === "yoy") return (b.yoy_pct ?? -Infinity) - (a.yoy_pct ?? -Infinity);
+        return mid(b) - mid(a);
+      }),
+    [filtered, sort],
+  );
+
+  const tableRows = useMemo(() => {
+    const val = (r: LocalityRow): number | string => {
+      if (tableSort.key === "mid") return mid(r);
+      if (tableSort.key === "yoy_pct") return r.yoy_pct ?? -Infinity;
+      return r[tableSort.key];
+    };
+    return [...filtered].sort((a, b) => {
+      const x = val(a);
+      const y = val(b);
+      return (typeof x === "string" ? x.localeCompare(String(y)) : x - (y as number)) * tableSort.dir;
+    });
+  }, [filtered, tableSort]);
+
+  const scaleMax = Math.max(1, ...rows.map((r) => r.price_high));
+  const detail = rows.find((r) => r.locality === selected) ?? null;
+  const softCount = segRows.filter(isSoft).length;
+
+  const defaultArea = segment === "Plots" ? (unit === "sqyd" ? 200 : 1200) : segment === "Apartments" ? 1500 : 2400;
+  const areaNum = Number(area) > 0 ? Number(area) : defaultArea;
+  const budget = Number(budgetLakh) > 0 ? Number(budgetLakh) * 1e5 : 0;
+  const fits = useMemo(
+    () =>
+      segRows
+        .map((r) => ({ r, low: r.price_low * areaNum, high: r.price_high * areaNum }))
+        .filter((x) => budget > 0 && x.low <= budget)
+        .sort((a, b) => b.low - a.low),
+    [segRows, areaNum, budget],
+  );
+
+  const otherCity: City = city === "Hyderabad" ? "Bangalore" : "Hyderabad";
+  const both = useMemo(
+    () => (["Hyderabad", "Bangalore"] as City[]).map((c) => ({ city: c, s: summarize(segRowsFor(c, segment)) })),
+    [segment],
+  );
+
+  function headerSort(key: TableSort["key"]) {
+    setTableSort((t) => (t.key === key ? { key, dir: (t.dir * -1) as 1 | -1 } : { key, dir: key === "locality" || key === "zone" ? 1 : -1 }));
+  }
+  return (
+    <>
+      <div className="flex min-w-0 items-start gap-3">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-emerald-500 to-indigo-600 text-white shadow-sm">
+          <SegIcon className="size-5" />
+        </span>
+        <div className="min-w-0">
+          <h2 className="text-lg font-semibold tracking-tight">
+            {segment} rates · {city}
+          </h2>
+          <p className="text-sm text-muted-foreground">{SEGMENT_BLURB[segment]}</p>
+        </div>
+      </div>
+
+      {segRows.length === 0 ? (
+        <Card>
+          <CardContent className="py-8 text-center text-sm text-muted-foreground">
+            No {segment.toLowerCase()} data for {city} yet. Add rows to real_estate/data/localities.csv and re-export.
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+            <Stat label="Median rate" value={inr(stats.median)} note={`per ${u}, range midpoint`} />
+            <Stat label="Rate band" value={`${inrShort(stats.low)}–${inrShort(stats.high)}`} note={`lowest to highest, per ${u}`} />
+            <Stat
+              label="Avg YoY"
+              value={stats.avgYoy === null ? "n/a" : `${stats.avgYoy > 0 ? "+" : ""}${stats.avgYoy.toFixed(1)}%`}
+              note={stats.yoyCount ? `${stats.yoyCount} of ${stats.count} localities report it` : "no source reports YoY yet"}
+            />
+            <Stat label="On metro now" value={`${stats.metro} of ${stats.count}`} note="station in or within ~3 km" />
+            <Stat label="Priciest" value={stats.top?.locality ?? "—"} note={stats.top ? `${inr(mid(stats.top))} / ${u}` : undefined} />
+          </div>
+
+          {(softCount > 0 || segment === "Independent Houses") && (
+            <p className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
+              <TriangleAlert className="mt-0.5 size-3.5 shrink-0" />
+              <span>
+                {softCount} of {segRows.length} rows here are estimates, government guidance values or developer quotes (marked in amber).
+                {segment === "Independent Houses" && city === "Bangalore" &&
+                  " Bangalore houses are modelled: plot rate on a 30×40 site + G+1 build at ₹2,500/sq ft, per 2,400 sq ft built-up."}
+                {unit === "sqyd" && " Hyderabad plots are quoted per sq yd (1 sq yd = 9 sq ft)."}
+              </span>
+            </p>
+          )}
+
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative min-w-40 flex-1 sm:max-w-60">
+                <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                <Input id="re-search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search locality" className="h-8 pl-8 text-sm" aria-label="Search locality" />
+              </div>
+              <Toggle label="Metro" options={METRO_FILTERS} value={metroFilter} onChange={setMetroFilter} />
+            </div>
+            <div className="flex flex-wrap gap-1.5" role="group" aria-label="Zone">
+              {zones.map((z) => (
+                <button
+                  key={z}
+                  type="button"
+                  aria-pressed={zone === z}
+                  onClick={() => setZone(z)}
+                  className={"rounded-full border px-2.5 py-0.5 text-xs transition-colors " + (zone === z ? "border-foreground bg-foreground text-background" : "text-muted-foreground hover:bg-muted")}
+                >
+                  {z}
+                </button>
+              ))}
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Showing {filtered.length} of {segRows.length} localities. Filters apply to the chart and the rates table.
+            </p>
+          </div>
+
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-base font-bold tracking-tight">Price range by locality</CardTitle>
+              <CardDescription className="text-xs">Bar spans low to high asking rate per {u}; the dot is the midpoint. Tap a locality for details.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Toggle label="Sort" options={SORTS} value={sort} onChange={setSort} />
+                <MetroLegend />
+              </div>
+              {rows.length === 0 ? (
+                <p className="py-6 text-center text-sm text-muted-foreground">No localities match.</p>
+              ) : (
+                <ul className="flex flex-col">
+                  {rows.map((r) => {
+                    const left = (r.price_low / scaleMax) * 100;
+                    const width = Math.max(1.2, ((r.price_high - r.price_low) / scaleMax) * 100);
+                    const dot = (mid(r) / scaleMax) * 100;
+                    const open = selected === r.locality;
+                    const soft = isSoft(r);
+                    return (
+                      <li key={r.locality} className="border-t first:border-t-0">
+                        <button
+                          type="button"
+                          aria-expanded={open}
+                          onClick={() => setSelected(open ? null : r.locality)}
+                          className="grid w-full grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1.5 rounded-md px-1 py-2 text-left hover:bg-muted/60 sm:grid-cols-[11rem_1fr_9rem]"
+                        >
+                          <span className="min-w-0">
+                            <span className="flex min-w-0 items-center gap-1.5">
+                              <span className="truncate text-sm font-medium">{r.locality}</span>
+                              <MetroIcon metro={r.metro} />
+                            </span>
+                            <span className="block truncate text-[11px] text-muted-foreground">
+                              {r.zone}
+                              {hasMetro(r.metro) && <span className={METRO_STYLE[r.metro.status].text}> · {r.metro.line}</span>}
+                            </span>
+                          </span>
+                          <span className="relative order-last col-span-2 h-2.5 rounded-full bg-muted sm:order-none sm:col-span-1" aria-hidden>
+                            <span
+                              className={"absolute inset-y-0 rounded-full " + (soft ? "bg-amber-400/70" : "bg-linear-to-r from-emerald-500/70 to-indigo-500/70")}
+                              style={{ left: `${left}%`, width: `${width}%` }}
+                            />
+                            <span
+                              className={"absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background " + (soft ? "bg-amber-500" : "bg-indigo-600")}
+                              style={{ left: `${dot}%` }}
+                            />
+                          </span>
+                          <span className="text-right text-xs tabular-nums">
+                            <span className="block font-semibold text-foreground">{inr(mid(r))}</span>
+                            <span className="block text-muted-foreground">
+                              <YoY value={r.yoy_pct} /> YoY
+                            </span>
+                          </span>
+                        </button>
+                        {open && detail && (
+                          <div className="mb-2 grid gap-2 rounded-lg border bg-muted/30 p-3 text-xs sm:grid-cols-2">
+                            <div>
+                              <div className="text-muted-foreground">Range</div>
+                              <div className="font-medium tabular-nums">
+                                {detail.price_low === detail.price_high ? `${inr(detail.price_low)} / ${u}` : `${inr(detail.price_low)} – ${inr(detail.price_high)} / ${u}`}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-muted-foreground">Basis</div>
+                              <div className={"font-medium " + (isSoft(detail) ? "text-amber-700 dark:text-amber-300" : "")}>{detail.basis}</div>
+                            </div>
+                            <div>
+                              <div className="text-muted-foreground">Typical ticket</div>
+                              <div className="font-medium tabular-nums">
+                                {lakhOrCrore(detail.price_low * defaultArea)} – {lakhOrCrore(detail.price_high * defaultArea)}
+                                <span className="font-normal text-muted-foreground">
+                                  {" "}
+                                  for {defaultArea.toLocaleString("en-IN")} {u}
+                                </span>
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-muted-foreground">Source · as of {formatDate(detail.as_of)}</div>
+                              <a href={detail.source_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-medium underline-offset-2 hover:underline">
+                                {detail.source}
+                                <ExternalLink className="size-3" />
+                              </a>
+                            </div>
+                            <div className="sm:col-span-2">
+                              <div className="text-muted-foreground">Metro</div>
+                              {hasMetro(detail.metro) ? (
+                                <div className="flex items-start gap-1.5">
+                                  <MetroIcon metro={detail.metro} size="md" />
+                                  <span>
+                                    <span className={"font-medium " + METRO_STYLE[detail.metro.status].text}>
+                                      {METRO_STYLE[detail.metro.status].label} · {detail.metro.line} line
+                                    </span>
+                                    <span className="text-foreground"> — {detail.metro.station}</span>
+                                    {detail.metro.note && <span className="block text-muted-foreground">{detail.metro.note}</span>}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="text-muted-foreground">No metro line yet{detail.metro?.note ? ` · ${detail.metro.note}` : ""}</div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              <p className="text-[11px] text-muted-foreground">
+                Scale 0 – {inr(scaleMax)} per {u}. Amber = estimate, guidance value or developer quote.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-base font-bold tracking-tight">
+                {segment} rate card · {city}
+              </CardTitle>
+              <CardDescription className="text-xs">Every tracked locality with its low, high and midpoint rate per {u}. Click a column to sort.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[44rem] text-sm">
+                  <thead>
+                    <tr className="text-xs text-muted-foreground">
+                      <SortTh k="locality" label="Locality" sort={tableSort} onSort={headerSort} />
+                      <SortTh k="zone" label="Zone" sort={tableSort} onSort={headerSort} />
+                      <SortTh k="price_low" label={`Low ₹/${u}`} num sort={tableSort} onSort={headerSort} />
+                      <SortTh k="price_high" label={`High ₹/${u}`} num sort={tableSort} onSort={headerSort} />
+                      <SortTh k="mid" label="Mid" num sort={tableSort} onSort={headerSort} />
+                      <SortTh k="yoy_pct" label="YoY" num sort={tableSort} onSort={headerSort} />
+                      <th className="pb-2 pl-3 text-left font-medium">Metro</th>
+                      <th className="pb-2 pl-3 text-left font-medium">Source</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tableRows.map((r) => (
+                      <tr key={r.locality} className={"border-t align-top " + (isSoft(r) ? "bg-amber-50/60 dark:bg-amber-950/20" : "")}>
+                        <td className="py-2 pr-3 font-medium">{r.locality}</td>
+                        <td className="py-2 pr-3 text-muted-foreground">{r.zone}</td>
+                        <td className="py-2 pl-3 text-right tabular-nums">{r.price_low.toLocaleString("en-IN")}</td>
+                        <td className="py-2 pl-3 text-right tabular-nums">{r.price_high.toLocaleString("en-IN")}</td>
+                        <td className="py-2 pl-3 text-right font-semibold tabular-nums">{Math.round(mid(r)).toLocaleString("en-IN")}</td>
+                        <td className="py-2 pl-3 text-right tabular-nums">
+                          <YoY value={r.yoy_pct} />
+                        </td>
+                        <td className="py-2 pl-3 text-xs">
+                          {hasMetro(r.metro) ? (
+                            <span className="inline-flex items-center gap-1.5">
+                              <MetroIcon metro={r.metro} />
+                              <span className={METRO_STYLE[r.metro.status].text}>{r.metro.line}</span>
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </td>
+                        <td className="py-2 pl-3 text-xs">
+                          <a href={r.source_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                            {r.source}
+                          </a>
+                          <span className="block text-muted-foreground">
+                            {r.basis} · {formatDate(r.as_of)}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base font-bold tracking-tight">
+                  <Wallet className="size-4" /> What fits my budget
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  {segment} in {city} where the low end of the range fits, for the size you enter.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-3">
+                <div className="flex flex-wrap items-end gap-3">
+                  <label className="flex flex-col gap-1 text-xs text-muted-foreground" htmlFor="re-budget">
+                    Budget (₹ lakh)
+                    <Input id="re-budget" inputMode="decimal" value={budgetLakh} onChange={(e) => setBudgetLakh(e.target.value)} className="h-8 w-28 text-sm tabular-nums" />
+                  </label>
+                  <label className="flex flex-col gap-1 text-xs text-muted-foreground" htmlFor="re-area">
+                    Size ({u}
+                    {segment === "Plots" ? "" : " built-up"})
+                    <Input id="re-area" inputMode="numeric" value={area} placeholder={String(defaultArea)} onChange={(e) => setArea(e.target.value)} className="h-8 w-28 text-sm tabular-nums" />
+                  </label>
+                  <p className="pb-1.5 text-xs text-muted-foreground">{budget > 0 ? `${fits.length} of ${segRows.length} localities` : "Enter a budget"}</p>
+                </div>
+                {budget > 0 && fits.length === 0 && <p className="text-sm text-muted-foreground">Nothing fits yet. Try a smaller size or a bigger budget.</p>}
+                {fits.length > 0 && (
+                  <ul className="flex flex-col divide-y text-sm">
+                    {fits.map(({ r, low, high }) => (
+                      <li key={r.locality} className="flex items-center justify-between gap-3 py-2">
+                        <span className="min-w-0">
+                          <span className="flex items-center gap-1.5 font-medium">
+                            <span className="truncate">{r.locality}</span>
+                            <MetroIcon metro={r.metro} />
+                          </span>
+                          <span className="block text-xs text-muted-foreground">{r.zone}</span>
+                        </span>
+                        <span className="text-right text-xs tabular-nums">
+                          <span className="block font-medium">{low === high ? lakhOrCrore(low) : `${lakhOrCrore(low)} – ${lakhOrCrore(high)}`}</span>
+                          {high <= budget ? (
+                            <span className="text-emerald-600 dark:text-emerald-400">Whole range fits</span>
+                          ) : (
+                            <span className="text-amber-700 dark:text-amber-300">Low end only</span>
+                          )}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <p className="text-[11px] text-muted-foreground">
+                  Asking price only. Add stamp duty and registration (roughly 6–8% in both states), GST on under-construction homes, and interiors.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-base font-bold tracking-tight">{segment} in both cities</CardTitle>
+                <CardDescription className="text-xs">Same segment, side by side, in each city&apos;s own unit.</CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4">
+                {both.map(({ city: c, s }) => (
+                  <div key={c} className={"flex flex-col gap-2 rounded-lg border p-3 " + (c === city ? "border-foreground/30 bg-muted/30" : "")}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold">{c}</span>
+                      {c !== city && (
+                        <button type="button" onClick={() => onCity(c)} className="inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground">
+                          Open <ChevronRight className="size-3" />
+                        </button>
+                      )}
+                    </div>
+                    {s.count === 0 ? (
+                      <span className="text-sm text-muted-foreground">No data yet</span>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+                        <span>
+                          <span className="block text-muted-foreground">Median</span>
+                          <span className="font-medium tabular-nums">
+                            {inr(s.median)}/{unitLabel(s.unit)}
+                          </span>
+                        </span>
+                        <span>
+                          <span className="block text-muted-foreground">Localities</span>
+                          <span className="font-medium tabular-nums">{s.count}</span>
+                        </span>
+                        <span>
+                          <span className="block text-muted-foreground">On metro</span>
+                          <span className="font-medium tabular-nums">{s.metro}</span>
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block text-muted-foreground">Most affordable</span>
+                          <span className="block truncate font-medium">{s.cheapest?.locality}</span>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <p className="text-[11px] text-muted-foreground">
+                  Switching to {otherCity} keeps you on the {segment} tab.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
+    </>
   );
 }
