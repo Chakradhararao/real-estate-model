@@ -1,6 +1,9 @@
 {
- "snapshot": "2026-11-12",
- "compared": null,
+ "snapshot": "2026-11-16",
+ "compared": {
+  "from": "2026-11-12",
+  "to": "2026-11-16"
+ },
  "threshold_pct": 3.0,
  "cities": [
   "Hyderabad",
@@ -2009,7 +2012,958 @@
    }
   }
  ],
- "changes": [],
+ "changes": [
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Jubilee Hills",
+   "unit": "sqft",
+   "old_price": 13525,
+   "last_price": 13525,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Banjara Hills",
+   "unit": "sqft",
+   "old_price": 10150,
+   "last_price": 10150,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "HITEC City",
+   "unit": "sqft",
+   "old_price": 13000,
+   "last_price": 13000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Gachibowli",
+   "unit": "sqft",
+   "old_price": 11850,
+   "last_price": 11850,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Financial District",
+   "unit": "sqft",
+   "old_price": 12250,
+   "last_price": 12250,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Kokapet",
+   "unit": "sqft",
+   "old_price": 11600,
+   "last_price": 11600,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Nallagandla",
+   "unit": "sqft",
+   "old_price": 11000,
+   "last_price": 11000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Narsingi",
+   "unit": "sqft",
+   "old_price": 10800,
+   "last_price": 10800,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Kondapur",
+   "unit": "sqft",
+   "old_price": 11175,
+   "last_price": 11175,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Tellapur",
+   "unit": "sqft",
+   "old_price": 8150,
+   "last_price": 8150,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Kollur",
+   "unit": "sqft",
+   "old_price": 6900,
+   "last_price": 6900,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Kukatpally / KPHB",
+   "unit": "sqft",
+   "old_price": 9250,
+   "last_price": 9250,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Miyapur",
+   "unit": "sqft",
+   "old_price": 8150,
+   "last_price": 8150,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Bachupally",
+   "unit": "sqft",
+   "old_price": 6675,
+   "last_price": 6675,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Kompally",
+   "unit": "sqft",
+   "old_price": 7000,
+   "last_price": 7000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Uppal",
+   "unit": "sqft",
+   "old_price": 7275,
+   "last_price": 7275,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "LB Nagar",
+   "unit": "sqft",
+   "old_price": 6575,
+   "last_price": 6575,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Shamshabad",
+   "unit": "sqft",
+   "old_price": 7850,
+   "last_price": 7850,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Apartments",
+   "locality": "Tukkuguda",
+   "unit": "sqft",
+   "old_price": 4775,
+   "last_price": 4775,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Plots",
+   "locality": "Tellapur",
+   "unit": "sqyd",
+   "old_price": 115000,
+   "last_price": 115000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Plots",
+   "locality": "Kokapet (residential)",
+   "unit": "sqyd",
+   "old_price": 37300,
+   "last_price": 37300,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Plots",
+   "locality": "Mokila - Kollur",
+   "unit": "sqyd",
+   "old_price": 55000,
+   "last_price": 55000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Plots",
+   "locality": "Shankarpalli",
+   "unit": "sqyd",
+   "old_price": 47500,
+   "last_price": 47500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Plots",
+   "locality": "Chevella",
+   "unit": "sqyd",
+   "old_price": 28500,
+   "last_price": 28500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Plots",
+   "locality": "Sangareddy",
+   "unit": "sqyd",
+   "old_price": 27000,
+   "last_price": 27000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Plots",
+   "locality": "Nizampet",
+   "unit": "sqyd",
+   "old_price": 26300,
+   "last_price": 26300,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Plots",
+   "locality": "Bachupally",
+   "unit": "sqyd",
+   "old_price": 22600,
+   "last_price": 22600,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Plots",
+   "locality": "Shamirpet",
+   "unit": "sqyd",
+   "old_price": 35000,
+   "last_price": 35000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Plots",
+   "locality": "Hayathnagar",
+   "unit": "sqyd",
+   "old_price": 21400,
+   "last_price": 21400,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Plots",
+   "locality": "Ibrahimpatnam",
+   "unit": "sqyd",
+   "old_price": 23000,
+   "last_price": 23000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Plots",
+   "locality": "Shamshabad (Bahadurguda)",
+   "unit": "sqyd",
+   "old_price": 31500,
+   "last_price": 31500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Villas",
+   "locality": "Kokapet",
+   "unit": "sqft",
+   "old_price": 13500,
+   "last_price": 13500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Villas",
+   "locality": "Tellapur",
+   "unit": "sqft",
+   "old_price": 11500,
+   "last_price": 11500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Villas",
+   "locality": "Narsingi",
+   "unit": "sqft",
+   "old_price": 9050,
+   "last_price": 9050,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Villas",
+   "locality": "Kollur / Nandigama",
+   "unit": "sqft",
+   "old_price": 8499,
+   "last_price": 8499,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Independent Houses",
+   "locality": "Yella Reddy Guda",
+   "unit": "sqft",
+   "old_price": 9150,
+   "last_price": 9150,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Independent Houses",
+   "locality": "Botanical Garden Road",
+   "unit": "sqft",
+   "old_price": 8500,
+   "last_price": 8500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Independent Houses",
+   "locality": "Manchirevula",
+   "unit": "sqft",
+   "old_price": 8050,
+   "last_price": 8050,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Independent Houses",
+   "locality": "Ilapur Road",
+   "unit": "sqft",
+   "old_price": 8500,
+   "last_price": 8500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Independent Houses",
+   "locality": "Bachupally",
+   "unit": "sqft",
+   "old_price": 6500,
+   "last_price": 6500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Hyderabad",
+   "segment": "Independent Houses",
+   "locality": "Chandrayangutta",
+   "unit": "sqft",
+   "old_price": 5500,
+   "last_price": 5500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "Indiranagar",
+   "unit": "sqft",
+   "old_price": 21500,
+   "last_price": 21500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "Jayanagar",
+   "unit": "sqft",
+   "old_price": 28846,
+   "last_price": 28846,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "Koramangala",
+   "unit": "sqft",
+   "old_price": 23891,
+   "last_price": 23891,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "HSR Layout",
+   "unit": "sqft",
+   "old_price": 16821,
+   "last_price": 16821,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "Bellandur",
+   "unit": "sqft",
+   "old_price": 15160,
+   "last_price": 15160,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "Harlur",
+   "unit": "sqft",
+   "old_price": 14517,
+   "last_price": 14517,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "Banashankari",
+   "unit": "sqft",
+   "old_price": 16021,
+   "last_price": 16021,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "Whitefield",
+   "unit": "sqft",
+   "old_price": 11000,
+   "last_price": 11000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "Sarjapur Road",
+   "unit": "sqft",
+   "old_price": 11050,
+   "last_price": 11050,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "Hoskote",
+   "unit": "sqft",
+   "old_price": 13967,
+   "last_price": 13967,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "Jakkur",
+   "unit": "sqft",
+   "old_price": 13351,
+   "last_price": 13351,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "Devanahalli",
+   "unit": "sqft",
+   "old_price": 11937,
+   "last_price": 11937,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "JP Nagar",
+   "unit": "sqft",
+   "old_price": 13076,
+   "last_price": 13076,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "K R Puram",
+   "unit": "sqft",
+   "old_price": 9376,
+   "last_price": 9376,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "Kengeri",
+   "unit": "sqft",
+   "old_price": 10043,
+   "last_price": 10043,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "Chandapura",
+   "unit": "sqft",
+   "old_price": 8926,
+   "last_price": 8926,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "Kanakapura",
+   "unit": "sqft",
+   "old_price": 8612,
+   "last_price": 8612,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Apartments",
+   "locality": "Electronic City",
+   "unit": "sqft",
+   "old_price": 9723,
+   "last_price": 9723,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Plots",
+   "locality": "Koramangala",
+   "unit": "sqft",
+   "old_price": 28500,
+   "last_price": 28500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Plots",
+   "locality": "Rajajinagar",
+   "unit": "sqft",
+   "old_price": 21000,
+   "last_price": 21000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Plots",
+   "locality": "HSR Layout",
+   "unit": "sqft",
+   "old_price": 19750,
+   "last_price": 19750,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Plots",
+   "locality": "JP Nagar",
+   "unit": "sqft",
+   "old_price": 18000,
+   "last_price": 18000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Plots",
+   "locality": "Hebbal",
+   "unit": "sqft",
+   "old_price": 14000,
+   "last_price": 14000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Plots",
+   "locality": "Bannerghatta Road",
+   "unit": "sqft",
+   "old_price": 13250,
+   "last_price": 13250,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Plots",
+   "locality": "Sarjapur Road",
+   "unit": "sqft",
+   "old_price": 14000,
+   "last_price": 14000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Plots",
+   "locality": "Electronic City",
+   "unit": "sqft",
+   "old_price": 12500,
+   "last_price": 12500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Plots",
+   "locality": "Yelahanka",
+   "unit": "sqft",
+   "old_price": 12000,
+   "last_price": 12000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Plots",
+   "locality": "Whitefield",
+   "unit": "sqft",
+   "old_price": 12500,
+   "last_price": 12500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Plots",
+   "locality": "K R Puram",
+   "unit": "sqft",
+   "old_price": 10600,
+   "last_price": 10600,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Plots",
+   "locality": "Hoskote / Attibele",
+   "unit": "sqft",
+   "old_price": 4000,
+   "last_price": 4000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Villas",
+   "locality": "Kannamangala",
+   "unit": "sqft",
+   "old_price": 16000,
+   "last_price": 16000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Villas",
+   "locality": "Hennur Road",
+   "unit": "sqft",
+   "old_price": 15900,
+   "last_price": 15900,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Villas",
+   "locality": "Sarjapur Road",
+   "unit": "sqft",
+   "old_price": 16318,
+   "last_price": 16318,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Villas",
+   "locality": "Whitefield",
+   "unit": "sqft",
+   "old_price": 11250,
+   "last_price": 11250,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Villas",
+   "locality": "Yelahanka / Jakkur / Hebbal",
+   "unit": "sqft",
+   "old_price": 10500,
+   "last_price": 10500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Villas",
+   "locality": "Bannerghatta Road",
+   "unit": "sqft",
+   "old_price": 9650,
+   "last_price": 9650,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Villas",
+   "locality": "Devanahalli",
+   "unit": "sqft",
+   "old_price": 8750,
+   "last_price": 8750,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Villas",
+   "locality": "Kanakapura Road",
+   "unit": "sqft",
+   "old_price": 8600,
+   "last_price": 8600,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Villas",
+   "locality": "Doddaballapura Road",
+   "unit": "sqft",
+   "old_price": 8250,
+   "last_price": 8250,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Villas",
+   "locality": "Electronic City",
+   "unit": "sqft",
+   "old_price": 8000,
+   "last_price": 8000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Villas",
+   "locality": "Chandapura",
+   "unit": "sqft",
+   "old_price": 7200,
+   "last_price": 7200,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Villas",
+   "locality": "Jigani",
+   "unit": "sqft",
+   "old_price": 5100,
+   "last_price": 5100,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Independent Houses",
+   "locality": "Koramangala",
+   "unit": "sqft",
+   "old_price": 16750,
+   "last_price": 16750,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Independent Houses",
+   "locality": "Rajajinagar",
+   "unit": "sqft",
+   "old_price": 13000,
+   "last_price": 13000,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Independent Houses",
+   "locality": "HSR Layout",
+   "unit": "sqft",
+   "old_price": 12375,
+   "last_price": 12375,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Independent Houses",
+   "locality": "JP Nagar",
+   "unit": "sqft",
+   "old_price": 11500,
+   "last_price": 11500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Independent Houses",
+   "locality": "Hebbal",
+   "unit": "sqft",
+   "old_price": 9500,
+   "last_price": 9500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Independent Houses",
+   "locality": "Bannerghatta Road",
+   "unit": "sqft",
+   "old_price": 9125,
+   "last_price": 9125,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Independent Houses",
+   "locality": "Sarjapur Road",
+   "unit": "sqft",
+   "old_price": 9500,
+   "last_price": 9500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Independent Houses",
+   "locality": "Electronic City",
+   "unit": "sqft",
+   "old_price": 8750,
+   "last_price": 8750,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Independent Houses",
+   "locality": "Yelahanka",
+   "unit": "sqft",
+   "old_price": 8500,
+   "last_price": 8500,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Independent Houses",
+   "locality": "Whitefield",
+   "unit": "sqft",
+   "old_price": 8750,
+   "last_price": 8750,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Independent Houses",
+   "locality": "K R Puram",
+   "unit": "sqft",
+   "old_price": 7800,
+   "last_price": 7800,
+   "change_pct": 0.0,
+   "triggered": false
+  },
+  {
+   "city": "Bangalore",
+   "segment": "Independent Houses",
+   "locality": "Hoskote / Attibele",
+   "unit": "sqft",
+   "old_price": 4500,
+   "last_price": 4500,
+   "change_pct": 0.0,
+   "triggered": false
+  }
+ ],
  "feeds": [
   {
    "name": "Listing portals — 99acres, MagicBricks, Housing.com, Square Yards price trends",
