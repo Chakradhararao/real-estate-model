@@ -47,23 +47,46 @@ const METRO_FILTERS: { key: MetroFilter; label: string }[] = [
   { key: "coming", label: "Coming" },
 ];
 
-const METRO_STYLE: Record<Exclude<MetroStatus, "none">, { label: string; chip: string; text: string }> = {
-  operational: { label: "Metro", chip: "bg-emerald-600 text-white", text: "text-emerald-700 dark:text-emerald-400" },
-  near: { label: "Metro nearby", chip: "border border-emerald-600 text-emerald-700 dark:text-emerald-400", text: "text-emerald-700 dark:text-emerald-400" },
-  upcoming: { label: "Under construction", chip: "bg-amber-500 text-white", text: "text-amber-700 dark:text-amber-300" },
-  planned: { label: "Planned", chip: "border border-dashed border-slate-400 text-slate-500 dark:text-slate-400", text: "text-slate-600 dark:text-slate-400" },
+const METRO_STYLE: Record<Exclude<MetroStatus, "none">, { label: string; text: string }> = {
+  operational: { label: "Station here", text: "text-foreground" },
+  near: { label: "Line within ~3 km", text: "text-foreground" },
+  upcoming: { label: "Under construction", text: "text-amber-700 dark:text-amber-300" },
+  planned: { label: "Planned", text: "text-muted-foreground" },
 };
+
+// The colours the lines are actually known by in each city.
+const LINE_COLOR: Record<string, string> = {
+  Blue: "#1d6fd8",
+  Red: "#d8372c",
+  Green: "#1c9a52",
+  Purple: "#7a3fb8",
+  Yellow: "#d9a400",
+  Pink: "#dd4f95",
+};
+const lineColor = (line: string) => LINE_COLOR[line.split("/")[0].trim()] ?? "#7b857f";
 
 const hasMetro = (m: MetroInfo | null): m is MetroInfo & { status: Exclude<MetroStatus, "none"> } => !!m && m.status !== "none";
 
-function MetroIcon({ metro, size = "sm" }: { metro: MetroInfo | null; size?: "sm" | "md" }) {
+function MetroIcon({ metro, size = "sm", color }: { metro: MetroInfo | null; size?: "sm" | "md"; color?: string }) {
   if (!hasMetro(metro)) return null;
   const st = METRO_STYLE[metro.status];
+  const c = color ?? lineColor(metro.line);
+  // Fill shows how real the line is: solid = station here, outline = nearby,
+  // tinted + dashed = being built, grey dashed = only planned.
+  const style =
+    metro.status === "operational"
+      ? { background: c, color: "#fff", border: `1.5px solid ${c}` }
+      : metro.status === "near"
+        ? { color: c, border: `1.5px solid ${c}` }
+        : metro.status === "upcoming"
+          ? { color: c, border: `1.5px dashed ${c}`, background: `color-mix(in srgb, ${c} 16%, transparent)` }
+          : { color: "#7b857f", border: "1.5px dashed #9aa39d" };
   return (
     <span
-      title={`${st.label}: ${metro.line} line · ${metro.station}`}
+      title={`${st.label}: ${metro.line} line, ${metro.station}`}
       aria-label={`${st.label}, ${metro.line} line`}
-      className={"inline-flex shrink-0 items-center justify-center rounded " + st.chip + (size === "md" ? " size-5" : " size-4")}
+      style={style}
+      className={"inline-flex shrink-0 items-center justify-center rounded-[5px] " + (size === "md" ? "size-5" : "size-4")}
     >
       <TrainFront className={size === "md" ? "size-3.5" : "size-3"} />
     </span>
@@ -75,10 +98,11 @@ function MetroLegend() {
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
       {(Object.keys(METRO_STYLE) as (keyof typeof METRO_STYLE)[]).map((k) => (
         <span key={k} className="inline-flex items-center gap-1">
-          <MetroIcon metro={{ status: k, line: "", station: METRO_STYLE[k].label, note: "", source_url: "" }} />
-          {k === "near" ? "Running line within ~3 km" : METRO_STYLE[k].label === "Metro" ? "Station in locality" : METRO_STYLE[k].label}
+          <MetroIcon metro={{ status: k, line: "", station: "", note: "", source_url: "" }} color="var(--primary)" />
+          {METRO_STYLE[k].label}
         </span>
       ))}
+      <span>Icon colour = metro line colour</span>
     </div>
   );
 }
@@ -140,7 +164,7 @@ function Toggle<T extends string>({
           className={
             "rounded-md px-3 py-1 text-xs font-medium transition-colors " +
             (value === o.key
-              ? "bg-linear-to-br from-emerald-500 to-indigo-600 text-white shadow-sm"
+              ? "bg-primary text-primary-foreground shadow-sm"
               : "text-muted-foreground hover:bg-muted hover:text-foreground")
           }
         >
@@ -151,11 +175,11 @@ function Toggle<T extends string>({
   );
 }
 
-function Stat({ label, value, note }: { label: string; value: string; note?: string }) {
+function Stat({ label, value, note, wide }: { label: string; value: string; note?: string; wide?: boolean }) {
   return (
-    <div className="flex min-w-0 flex-col gap-1 rounded-xl border bg-card p-3 shadow-sm sm:p-4">
-      <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{label}</span>
-      <span className="truncate text-xl font-semibold tabular-nums sm:text-2xl" title={value}>
+    <div className={"flex min-w-0 flex-col gap-0.5 bg-card p-3 sm:p-4 " + (wide ? "col-span-2 lg:col-span-1" : "")}>
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className="truncate font-heading text-xl font-semibold tabular-nums sm:text-2xl" title={value}>
         {value}
       </span>
       {note && <span className="text-xs text-muted-foreground">{note}</span>}
@@ -272,7 +296,7 @@ function scoreRows(rows: LocalityRow[], priority: Priority): Scored[] {
 function ScoreBadge({ score }: { score: number }) {
   const tone =
     score >= 65
-      ? "bg-emerald-600 text-white"
+      ? "bg-primary text-primary-foreground"
       : score >= 45
         ? "bg-amber-500 text-white"
         : "bg-muted text-muted-foreground";
@@ -288,7 +312,7 @@ function MiniBar({ label, value }: { label: string; value: number }) {
     <span className="grid grid-cols-[3.2rem_1fr] items-center gap-1.5 text-[11px] text-muted-foreground">
       {label}
       <span className="h-1.5 rounded-full bg-muted">
-        <span className="block h-full rounded-full bg-indigo-500/80" style={{ width: `${Math.round(value)}%` }} />
+        <span className="block h-full rounded-full bg-primary/70" style={{ width: `${Math.round(value)}%` }} />
       </span>
     </span>
   );
@@ -318,10 +342,10 @@ function BuyShortlist({
   const u = unitLabel(unit);
 
   return (
-    <Card className="border-indigo-500/30 shadow-sm">
+    <Card className="border-primary/30 shadow-sm">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base font-bold tracking-tight">
-          <Sparkles className="size-4 text-indigo-600 dark:text-indigo-400" /> Which to buy · {segment} in {city}
+        <CardTitle className="flex items-center gap-2 font-heading text-base font-semibold tracking-tight">
+          <Sparkles className="size-4 text-primary" /> Which {segment.toLowerCase()} to buy in {city}
         </CardTitle>
         <CardDescription className="text-xs">
           Localities ranked by a score out of 100 that blends price, reported yearly growth and metro access. Pick what matters most to you.
@@ -332,7 +356,7 @@ function BuyShortlist({
           <Toggle label="Priority" options={PRIORITIES} value={priority} onChange={setPriority} />
           {budget > 0 && (
             <label className="inline-flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground" htmlFor="re-budget-only">
-              <input id="re-budget-only" type="checkbox" checked={budgetOnly} onChange={(e) => setBudgetOnly(e.target.checked)} className="size-3.5 accent-indigo-600" />
+              <input id="re-budget-only" type="checkbox" checked={budgetOnly} onChange={(e) => setBudgetOnly(e.target.checked)} className="size-3.5 accent-primary" />
               Only within my budget ({lakhOrCrore(budget)} for {areaNum.toLocaleString("en-IN")} {u})
             </label>
           )}
@@ -343,10 +367,10 @@ function BuyShortlist({
         ) : (
           <ol className="grid gap-3 lg:grid-cols-3">
             {shown.map((x, i) => (
-              <li key={x.r.locality} className={"flex min-w-0 flex-col gap-2 rounded-xl border p-3 " + (i === 0 && !showAll ? "border-indigo-500/50 bg-indigo-50/50 dark:bg-indigo-950/20" : "bg-card")}>
+              <li key={x.r.locality} className={"flex min-w-0 flex-col gap-2 rounded-xl border p-3 " + (i === 0 && !showAll ? "border-primary/50 bg-primary/5" : "bg-card")}>
                 <div className="flex items-start justify-between gap-2">
                   <span className="min-w-0">
-                    <span className="block text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                    <span className="block text-xs font-medium text-muted-foreground">
                       {i === 0 ? "Top pick" : `#${i + 1}`}
                     </span>
                     <span className="flex min-w-0 items-center gap-1.5">
@@ -354,7 +378,7 @@ function BuyShortlist({
                       <MetroIcon metro={x.r.metro} />
                     </span>
                     <span className="block text-xs text-muted-foreground tabular-nums">
-                      {x.r.zone} · {inr(mid(x.r))}/{u}
+                      {x.r.zone}, {inr(mid(x.r))}/{u}
                     </span>
                   </span>
                   <ScoreBadge score={x.score} />
@@ -390,7 +414,7 @@ function BuyShortlist({
         )}
 
         {list.length > 3 && (
-          <button type="button" onClick={() => setShowAll((v) => !v)} className="self-start text-xs font-medium text-indigo-700 hover:underline dark:text-indigo-300">
+          <button type="button" onClick={() => setShowAll((v) => !v)} className="self-start text-xs font-medium text-primary hover:underline">
             {showAll ? "Show top 3 only" : `Show all ${list.length} ranked`}
           </button>
         )}
@@ -450,7 +474,7 @@ export default function RealEstatePanel() {
     <div className="flex min-w-0 flex-col gap-6 [&>*]:min-w-0">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <p className="min-w-0 text-sm text-muted-foreground">
-          Asking-price ranges by locality · snapshot {formatDate(DATA.snapshot)} · alerts at ±{DATA.threshold_pct}% between snapshots
+          Asking-price ranges by locality, last updated {formatDate(DATA.snapshot)}.
         </p>
         <Toggle label="City" options={DATA.cities.map((c) => ({ key: c, label: c }))} value={city} onChange={pickCity} />
       </div>
@@ -475,7 +499,7 @@ export default function RealEstatePanel() {
               className={
                 "flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2.5 text-sm font-medium transition-colors sm:rounded-lg sm:border-b-0 " +
                 (active
-                  ? "border-foreground text-foreground sm:bg-foreground sm:text-background sm:shadow"
+                  ? "border-primary text-foreground sm:bg-primary sm:text-primary-foreground sm:shadow-sm"
                   : "border-transparent text-muted-foreground hover:text-foreground sm:hover:bg-muted")
               }
             >
@@ -516,7 +540,7 @@ function Overview({ city, onOpen }: { city: City; onOpen: (s: Segment) => void }
   return (
     <>
       <div>
-        <h2 className="text-lg font-semibold tracking-tight">{city} at a glance</h2>
+        <h2 className="font-heading text-xl font-semibold tracking-tight">{city} at a glance</h2>
         <p className="text-sm text-muted-foreground">Open a segment for its full rates dashboard.</p>
       </div>
 
@@ -533,7 +557,7 @@ function Overview({ city, onOpen }: { city: City; onOpen: (s: Segment) => void }
             >
               <span className="flex items-center justify-between gap-2">
                 <span className="flex items-center gap-2 font-semibold">
-                  <span className="flex size-8 items-center justify-center rounded-lg bg-linear-to-br from-emerald-500 to-indigo-600 text-white">
+                  <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                     <Icon className="size-4" />
                   </span>
                   {label}
@@ -568,7 +592,7 @@ function Overview({ city, onOpen }: { city: City; onOpen: (s: Segment) => void }
                   </span>
                   {top && (
                     <span className="flex items-center gap-1.5 border-t pt-2 text-xs">
-                      <Sparkles className="size-3.5 shrink-0 text-indigo-600 dark:text-indigo-400" />
+                      <Sparkles className="size-3.5 shrink-0 text-primary" />
                       <span className="text-muted-foreground">Top pick</span>
                       <span className="truncate font-medium">{top.r.locality}</span>
                       <span className="ml-auto tabular-nums text-muted-foreground">score {top.score}</span>
@@ -584,7 +608,7 @@ function Overview({ city, onOpen }: { city: City; onOpen: (s: Segment) => void }
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle className="text-base font-bold tracking-tight">Hyderabad vs Bangalore</CardTitle>
+            <CardTitle className="font-heading text-base font-semibold tracking-tight">Hyderabad vs Bangalore</CardTitle>
             <CardDescription className="text-xs">
               Median midpoint per sq ft, by segment (Hyderabad plots converted from sq yd). Each city tracks different localities, so treat this as a rough guide.
             </CardDescription>
@@ -605,7 +629,7 @@ function Overview({ city, onOpen }: { city: City; onOpen: (s: Segment) => void }
                       <span className={name === city ? "font-semibold" : "text-muted-foreground"}>{name}</span>
                       <span className="h-2 rounded-full bg-muted">
                         <span
-                          className={"block h-full rounded-full " + (name === "Hyderabad" ? "bg-emerald-500" : "bg-indigo-500")}
+                          className={"block h-full rounded-full " + (name === city ? "bg-primary" : "bg-primary/35")}
                           style={{ width: `${(v / compareMax) * 100}%` }}
                         />
                       </span>
@@ -620,7 +644,7 @@ function Overview({ city, onOpen }: { city: City; onOpen: (s: Segment) => void }
 
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle className="text-base font-bold tracking-tight">Price alerts · {city}</CardTitle>
+            <CardTitle className="font-heading text-base font-semibold tracking-tight">Price alerts in {city}</CardTitle>
             <CardDescription className="text-xs">
               {DATA.compared
                 ? `Localities that moved ±${DATA.threshold_pct}% or more between ${formatDate(DATA.compared.from)} and ${formatDate(DATA.compared.to)}.`
@@ -797,12 +821,12 @@ function SegmentDashboard({ city, segment, onCity }: { city: City; segment: Segm
   return (
     <>
       <div className="flex min-w-0 items-start gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-emerald-500 to-indigo-600 text-white shadow-sm">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
           <SegIcon className="size-5" />
         </span>
         <div className="min-w-0">
-          <h2 className="text-lg font-semibold tracking-tight">
-            {segment} rates · {city}
+          <h2 className="font-heading text-xl font-semibold tracking-tight">
+            {segment.replace(/s$/, "")} rates in {city}
           </h2>
           <p className="text-sm text-muted-foreground">{SEGMENT_BLURB[segment]}</p>
         </div>
@@ -816,7 +840,7 @@ function SegmentDashboard({ city, segment, onCity }: { city: City; segment: Segm
         </Card>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border shadow-sm lg:grid-cols-5">
             <Stat label="Median rate" value={inr(stats.median)} note={`per ${u}, range midpoint`} />
             <Stat label="Rate band" value={`${inrShort(stats.low)}–${inrShort(stats.high)}`} note={`lowest to highest, per ${u}`} />
             <Stat
@@ -825,7 +849,7 @@ function SegmentDashboard({ city, segment, onCity }: { city: City; segment: Segm
               note={stats.yoyCount ? `${stats.yoyCount} of ${stats.count} localities report it` : "no source reports YoY yet"}
             />
             <Stat label="On metro now" value={`${stats.metro} of ${stats.count}`} note="station in or within ~3 km" />
-            <Stat label="Priciest" value={stats.top?.locality ?? "—"} note={stats.top ? `${inr(mid(stats.top))} / ${u}` : undefined} />
+            <Stat wide label="Priciest" value={stats.top?.locality ?? "—"} note={stats.top ? `${inr(mid(stats.top))} / ${u}` : undefined} />
           </div>
 
           {(softCount > 0 || segment === "Independent Houses") && (
@@ -857,7 +881,7 @@ function SegmentDashboard({ city, segment, onCity }: { city: City; segment: Segm
                   type="button"
                   aria-pressed={zone === z}
                   onClick={() => setZone(z)}
-                  className={"rounded-full border px-2.5 py-0.5 text-xs transition-colors " + (zone === z ? "border-foreground bg-foreground text-background" : "text-muted-foreground hover:bg-muted")}
+                  className={"rounded-full border px-2.5 py-0.5 text-xs transition-colors " + (zone === z ? "border-primary bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted")}
                 >
                   {z}
                 </button>
@@ -870,7 +894,7 @@ function SegmentDashboard({ city, segment, onCity }: { city: City; segment: Segm
 
           <Card className="shadow-sm">
             <CardHeader>
-              <CardTitle className="text-base font-bold tracking-tight">Price range by locality</CardTitle>
+              <CardTitle className="font-heading text-base font-semibold tracking-tight">Price range by locality</CardTitle>
               <CardDescription className="text-xs">Bar spans low to high asking rate per {u}; the dot is the midpoint. Tap a locality for details.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
@@ -881,6 +905,16 @@ function SegmentDashboard({ city, segment, onCity }: { city: City; segment: Segm
               {rows.length === 0 ? (
                 <p className="py-6 text-center text-sm text-muted-foreground">No localities match.</p>
               ) : (
+                <>
+                <div className="hidden grid-cols-[11rem_1fr_9rem] gap-x-3 px-1 text-[11px] tabular-nums text-muted-foreground sm:grid" aria-hidden>
+                  <span>Locality</span>
+                  <span className="flex justify-between">
+                    {[0, 0.25, 0.5, 0.75, 1].map((t) => (
+                      <span key={t}>{t === 0 ? "₹0" : inrShort(scaleMax * t)}</span>
+                    ))}
+                  </span>
+                  <span className="text-right">Midpoint / {u}</span>
+                </div>
                 <ul className="flex flex-col">
                   {rows.map((r) => {
                     const left = (r.price_low / scaleMax) * 100;
@@ -894,7 +928,7 @@ function SegmentDashboard({ city, segment, onCity }: { city: City; segment: Segm
                           type="button"
                           aria-expanded={open}
                           onClick={() => setSelected(open ? null : r.locality)}
-                          className="grid w-full grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1.5 rounded-md px-1 py-2 text-left hover:bg-muted/60 sm:grid-cols-[11rem_1fr_9rem]"
+                          className="grid w-full grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1.5 rounded-md px-1 py-2 text-left transition-colors hover:bg-muted/60 focus-visible:outline-2 focus-visible:outline-primary sm:grid-cols-[11rem_1fr_9rem]"
                         >
                           <span className="min-w-0">
                             <span className="flex min-w-0 items-center gap-1.5">
@@ -903,16 +937,17 @@ function SegmentDashboard({ city, segment, onCity }: { city: City; segment: Segm
                             </span>
                             <span className="block truncate text-[11px] text-muted-foreground">
                               {r.zone}
-                              {hasMetro(r.metro) && <span className={METRO_STYLE[r.metro.status].text}> · {r.metro.line}</span>}
+                              {hasMetro(r.metro) && <span>, {r.metro.line} line</span>}
                             </span>
                           </span>
                           <span className="relative order-last col-span-2 h-2.5 rounded-full bg-muted sm:order-none sm:col-span-1" aria-hidden>
+                            <span className="absolute -inset-y-1 z-10 w-px bg-foreground/40" style={{ left: `${Math.min(100, (stats.median / scaleMax) * 100)}%` }} />
                             <span
-                              className={"absolute inset-y-0 rounded-full " + (soft ? "bg-amber-400/70" : "bg-linear-to-r from-emerald-500/70 to-indigo-500/70")}
+                              className={"absolute inset-y-0 rounded-full " + (soft ? "bg-amber-400/70" : "bg-primary/45")}
                               style={{ left: `${left}%`, width: `${width}%` }}
                             />
                             <span
-                              className={"absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background " + (soft ? "bg-amber-500" : "bg-indigo-600")}
+                              className={"absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background " + (soft ? "bg-amber-500" : "bg-primary")}
                               style={{ left: `${dot}%` }}
                             />
                           </span>
@@ -958,10 +993,10 @@ function SegmentDashboard({ city, segment, onCity }: { city: City; segment: Segm
                                 <div className="flex items-start gap-1.5">
                                   <MetroIcon metro={detail.metro} size="md" />
                                   <span>
-                                    <span className={"font-medium " + METRO_STYLE[detail.metro.status].text}>
-                                      {METRO_STYLE[detail.metro.status].label} · {detail.metro.line} line
+                                    <span className="font-medium">
+                                      {detail.metro.line} line: {METRO_STYLE[detail.metro.status].label.toLowerCase()}
                                     </span>
-                                    <span className="text-foreground"> — {detail.metro.station}</span>
+                                    <span className="text-muted-foreground"> ({detail.metro.station})</span>
                                     {detail.metro.note && <span className="block text-muted-foreground">{detail.metro.note}</span>}
                                   </span>
                                 </div>
@@ -975,17 +1010,18 @@ function SegmentDashboard({ city, segment, onCity }: { city: City; segment: Segm
                     );
                   })}
                 </ul>
+                </>
               )}
               <p className="text-[11px] text-muted-foreground">
-                Scale 0 – {inr(scaleMax)} per {u}. Amber = estimate, guidance value or developer quote.
+                The thin vertical line on each bar marks the {city} median ({inr(stats.median)} per {u}). Amber = estimate, guidance value or developer quote.
               </p>
             </CardContent>
           </Card>
 
           <Card className="shadow-sm">
             <CardHeader>
-              <CardTitle className="text-base font-bold tracking-tight">
-                {segment} rate card · {city}
+              <CardTitle className="font-heading text-base font-semibold tracking-tight">
+                {segment} rate card for {city}
               </CardTitle>
               <CardDescription className="text-xs">Every tracked locality with its low, high and midpoint rate per {u}. Click a column to sort.</CardDescription>
             </CardHeader>
@@ -1044,7 +1080,7 @@ function SegmentDashboard({ city, segment, onCity }: { city: City; segment: Segm
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="shadow-sm">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base font-bold tracking-tight">
+                <CardTitle className="flex items-center gap-2 font-heading text-base font-semibold tracking-tight">
                   <Wallet className="size-4" /> What fits my budget
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -1096,7 +1132,7 @@ function SegmentDashboard({ city, segment, onCity }: { city: City; segment: Segm
 
             <Card className="shadow-sm">
               <CardHeader>
-                <CardTitle className="text-base font-bold tracking-tight">{segment} in both cities</CardTitle>
+                <CardTitle className="font-heading text-base font-semibold tracking-tight">{segment} in both cities</CardTitle>
                 <CardDescription className="text-xs">Same segment, side by side, in each city&apos;s own unit.</CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col gap-4">
